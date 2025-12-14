@@ -1,15 +1,18 @@
-import { useState } from "react";
 import { Link, Routes, Route } from "react-router-dom";
-import { LayoutDashboard, Newspaper, Image, FileText, Megaphone, ChevronLeft } from "lucide-react";
+import { LayoutDashboard, Newspaper, Image, FileText, Megaphone, ChevronLeft, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Admin sub-pages (simplified for now)
 function AdminDashboard() {
+  const { user } = useAuth();
+  
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-3xl font-bold">Admin Dashboard</h1>
-      <p className="text-muted">Welcome to the Kagōunga admin panel. Manage your content from here.</p>
+      <div>
+        <h1 className="font-heading text-3xl font-bold">Admin Dashboard</h1>
+        <p className="text-muted mt-1">Welcome back, {user?.email}</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "News Posts", icon: Newspaper, href: "/admin/news", count: 3 },
@@ -28,12 +31,6 @@ function AdminDashboard() {
           </Link>
         ))}
       </div>
-      <div className="p-4 bg-secondary/50 rounded-lg">
-        <p className="text-sm text-muted">
-          <strong>Note:</strong> Full admin CRUD functionality requires authentication. 
-          This is a demo interface showing the admin structure.
-        </p>
-      </div>
     </div>
   );
 }
@@ -41,16 +38,30 @@ function AdminDashboard() {
 function AdminPlaceholder({ title }: { title: string }) {
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-3xl font-bold">{title}</h1>
+      <div className="flex items-center gap-4">
+        <Link to="/admin">
+          <Button variant="ghost" size="sm">
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Back
+          </Button>
+        </Link>
+        <h1 className="font-heading text-3xl font-bold">{title}</h1>
+      </div>
       <div className="p-8 text-center bg-card rounded-xl border border-border">
         <p className="text-muted">Admin management interface for {title.toLowerCase()}.</p>
-        <p className="text-sm text-muted mt-2">Authentication required for full functionality.</p>
+        <p className="text-sm text-muted mt-2">Full CRUD functionality coming soon.</p>
       </div>
     </div>
   );
 }
 
 const Admin = () => {
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -69,6 +80,13 @@ const Admin = () => {
               </div>
               <span className="font-heading font-semibold">Admin Panel</span>
             </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted hidden sm:block">{user?.email}</span>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
           </div>
         </div>
       </header>

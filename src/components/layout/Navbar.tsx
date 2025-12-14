@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Menu, X, Search, User } from "lucide-react";
+import { ShoppingCart, Menu, X, Search, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -18,6 +26,11 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
+  const { user, isAdmin, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <>
@@ -72,12 +85,50 @@ export function Navbar() {
                 </Button>
               </Link>
 
-              {/* User/Account (placeholder) */}
-              <Link to="/admin" className="hidden sm:block">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
+              {/* User/Account */}
+              <div className="hidden sm:block">
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="relative">
+                        <User className="h-5 w-5" />
+                        {isAdmin && (
+                          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent">
+                            <Shield className="h-2.5 w-2.5 text-accent-foreground" />
+                          </span>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <div className="px-2 py-1.5">
+                        <p className="text-sm font-medium truncate">{user.email}</p>
+                        {isAdmin && (
+                          <p className="text-xs text-accent">Admin</p>
+                        )}
+                      </div>
+                      <DropdownMenuSeparator />
+                      {isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="cursor-pointer">
+                            <Shield className="h-4 w-4 mr-2" />
+                            Admin Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link to="/auth">
+                    <Button variant="ghost" size="icon">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                )}
+              </div>
 
               {/* Mobile Menu Toggle */}
               <Button
@@ -95,7 +146,7 @@ export function Navbar() {
           <div
             className={cn(
               "overflow-hidden transition-all duration-300 md:hidden",
-              isOpen ? "max-h-80 pb-4" : "max-h-0"
+              isOpen ? "max-h-96 pb-4" : "max-h-0"
             )}
           >
             <div className="flex flex-col gap-2 pt-2">
@@ -109,13 +160,36 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/admin"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-secondary hover:text-foreground"
-                onClick={() => setIsOpen(false)}
-              >
-                Admin
-              </Link>
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="rounded-lg px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-secondary"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsOpen(false);
+                    }}
+                    className="rounded-lg px-3 py-2 text-left text-sm font-medium text-destructive transition-colors hover:bg-secondary"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-secondary hover:text-foreground"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </nav>
