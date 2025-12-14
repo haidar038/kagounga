@@ -1,7 +1,8 @@
 import { Link, Routes, Route } from "react-router-dom";
-import { LayoutDashboard, Newspaper, Image, FileText, Megaphone, ChevronLeft, LogOut } from "lucide-react";
+import { LayoutDashboard, Newspaper, Image, FileText, Megaphone, ChevronLeft, LogOut, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import AdminUsers from "./AdminUsers";
 
 // Admin sub-pages (simplified for now)
 function AdminDashboard() {
@@ -13,12 +14,13 @@ function AdminDashboard() {
         <h1 className="font-heading text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted mt-1">Welcome back, {user?.email}</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { label: "News Posts", icon: Newspaper, href: "/admin/news", count: 3 },
           { label: "Gallery Images", icon: Image, href: "/admin/gallery", count: 6 },
           { label: "Signature Points", icon: FileText, href: "/admin/signature", count: 4 },
           { label: "CTA & Mission", icon: Megaphone, href: "/admin/content", count: 2 },
+          { label: "User Roles", icon: Users, href: "/admin/users", count: "Manage" },
         ].map((item) => (
           <Link
             key={item.label}
@@ -27,7 +29,7 @@ function AdminDashboard() {
           >
             <item.icon className="h-8 w-8 text-accent mb-3" />
             <h3 className="font-heading font-semibold">{item.label}</h3>
-            <p className="text-sm text-muted">{item.count} items</p>
+            <p className="text-sm text-muted">{item.count} {typeof item.count === "number" ? "items" : ""}</p>
           </Link>
         ))}
       </div>
@@ -99,6 +101,7 @@ const Admin = () => {
           <Route path="/gallery" element={<AdminPlaceholder title="Gallery Management" />} />
           <Route path="/signature" element={<AdminPlaceholder title="Signature Points" />} />
           <Route path="/content" element={<AdminPlaceholder title="CTA & Mission Content" />} />
+          <Route path="/users" element={<AdminUsers />} />
         </Routes>
       </main>
     </div>
