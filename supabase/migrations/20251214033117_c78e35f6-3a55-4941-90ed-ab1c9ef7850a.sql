@@ -90,11 +90,11 @@ INSERT INTO public.signature_points (icon_name, heading, description, display_or
 
 -- Seed initial mission content
 INSERT INTO public.mission_content (heading, paragraph, image_url, cta_text, cta_url) VALUES
-  ('Our Mission', 'Kagōunga is dedicated to preserving and sharing the rich culinary heritage of Papua. We bring authentic popeda to modern tables, making traditional flavors accessible to everyone while supporting local sago farmers and sustainable practices.', 'https://kagounga.id/wp-content/uploads/2024/07/about-us-2.webp', 'About Us', '/about');
+  ('Our Mission', 'Kagōunga is dedicated to preserving and sharing the rich culinary heritage of Maluku Utara. We bring authentic popeda to modern tables, making traditional flavors accessible to everyone while supporting local sago farmers and sustainable practices.', 'https://kagounga.id/wp-content/uploads/2024/07/about-us-2.webp', 'About Us', '/about');
 
 -- Seed initial CTA content
 INSERT INTO public.cta_content (headline, description, button_text, button_url) VALUES
-  ('Dapatkan Popeda Segera', 'Promo khusus untuk pembelian pertama. Nikmati kelezatan popeda autentik Papua hari ini.', 'Beli Sekarang', '/products');
+  ('Dapatkan Popeda Segera', 'Promo khusus untuk pembelian pertama. Nikmati kelezatan popeda autentik Maluku Utara hari ini.', 'Beli Sekarang', '/products');
 
 -- Seed initial gallery images
 INSERT INTO public.gallery_images (image_url, alt_text, caption, display_order) VALUES

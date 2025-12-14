@@ -1,26 +1,26 @@
 {
-  "name": "Kagōunga — Popeda Instant",
-  "short_name": "Kagōunga",
-  "description": "Makanan tradisional Papua yang praktis dan lezat. Move, Moreover!",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#FAFAF9",
-  "theme_color": "#DBF066",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "categories": ["food", "shopping"],
-  "lang": "id"
+    "name": "Kagōunga — Popeda Instant",
+    "short_name": "Kagōunga",
+    "description": "Makanan tradisional Maluku Utara yang praktis dan lezat. Move, Moreover!",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FAFAF9",
+    "theme_color": "#DBF066",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["food", "shopping"],
+    "lang": "id"
 }
