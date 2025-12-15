@@ -11,14 +11,14 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Ping Supabase Project
-              if: secrets.VITE_SUPABASE_URL != ''
+              if: ${{ secrets.VITE_SUPABASE_URL != '' }}
               run: |
                   echo "Pinging Supabase project to prevent pausing..."
                   curl -I ${{ secrets.VITE_SUPABASE_URL }}/rest/v1/ || true
                   echo "Ping complete."
 
             - name: Warning if Secret Missing
-              if: secrets.VITE_SUPABASE_URL == ''
+              if: ${{ secrets.VITE_SUPABASE_URL == '' }}
               run: |
                   echo "::warning::VITE_SUPABASE_URL secret is not set. The keep-alive ping will not work."
                   echo "Please go to Repository Settings -> Secrets and variables -> Actions and add 'VITE_SUPABASE_URL'."
