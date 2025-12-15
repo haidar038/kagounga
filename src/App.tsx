@@ -19,44 +19,48 @@ import NewsDetail from "./pages/NewsDetail";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:slug" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/checkout/success" element={<CheckoutSuccess />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/news/:slug" element={<NewsDetail />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute requireAdmin>
-                    <Admin />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+            <CartProvider>
+                <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<Index />} />
+                            <Route path="/products" element={<Products />} />
+                            <Route path="/products/:slug" element={<ProductDetail />} />
+                            <Route path="/cart" element={<Cart />} />
+                            <Route path="/checkout" element={<Checkout />} />
+                            <Route path="/checkout/success" element={<CheckoutSuccess />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/contact" element={<Contact />} />
+                            <Route path="/news" element={<News />} />
+                            <Route path="/news/:slug" element={<NewsDetail />} />
+                            <Route path="/auth" element={<Auth />} />
+                            <Route
+                                path="/admin/*"
+                                element={
+                                    <ProtectedRoute requireAdmin>
+                                        <Admin />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route path="/privacy" element={<PrivacyPolicy />} />
+                            <Route path="/terms" element={<TermsAndConditions />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </BrowserRouter>
+                </TooltipProvider>
+            </CartProvider>
+        </AuthProvider>
+    </QueryClientProvider>
 );
 
 export default App;
