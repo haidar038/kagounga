@@ -1,10 +1,17 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Shield, Lock, Eye, FileText, Mail } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function PrivacyPolicy() {
     return (
         <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
+            <SEO
+                title="Kebijakan Privasi"
+                description="Kebijakan privasi Kagōunga menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda."
+                url="/privacy"
+                keywords="kebijakan privasi, privacy policy, perlindungan data, kagounga"
+            />
             <Navbar />
             <main className="flex-1">
                 {/* Header Section */}

@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { mockProducts, categories } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { SEO } from "@/components/SEO";
 
 const Products = () => {
     const [selectedCategory, setSelectedCategory] = useState("all");
@@ -46,6 +47,12 @@ const Products = () => {
 
     return (
         <Layout>
+            <SEO
+                title="Produk"
+                description="Jelajahi koleksi lengkap produk Kagōunga Popeda Instant. Temukan berbagai varian popeda dan makanan tradisional Maluku Utara."
+                url="/products"
+                keywords="popeda instant, produk kagounga, makanan maluku, popeda sagu"
+            />
             <div className="min-h-screen bg-background">
                 {/* Header */}
                 <section className="bg-secondary/30 py-12 sm:py-16">

@@ -1,10 +1,17 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Scale, FileCheck, AlertCircle, HelpCircle, Mail, ScrollText } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function TermsAndConditions() {
     return (
         <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
+            <SEO
+                title="Syarat & Ketentuan"
+                description="Baca syarat dan ketentuan penggunaan layanan Kagōunga sebelum melakukan pembelian atau menggunakan situs kami."
+                url="/terms"
+                keywords="syarat ketentuan, terms conditions, aturan penggunaan, kagounga"
+            />
             <Navbar />
             <main className="flex-1">
                 {/* Header Section */}

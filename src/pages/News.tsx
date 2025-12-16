@@ -6,6 +6,7 @@ import { id as idLocale } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { SEO } from "@/components/SEO";
 
 interface NewsPost {
     id: string;
@@ -29,6 +30,12 @@ const News = () => {
 
     return (
         <Layout>
+            <SEO
+                title="Berita & Artikel"
+                description="Baca berita terbaru, cerita, dan artikel menarik dari Kagōunga seputar popeda, kuliner Maluku Utara, dan budaya lokal."
+                url="/news"
+                keywords="berita kagounga, artikel popeda, news maluku utara, cerita kuliner"
+            />
             {/* Hero */}
             <section className="bg-secondary/30 py-16 sm:py-20">
                 <div className="container-page text-center">

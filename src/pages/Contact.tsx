@@ -3,6 +3,7 @@ import { MapPin, Phone, Mail, Send, Loader2 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { SEO } from "@/components/SEO";
 
 const Contact = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +37,7 @@ const Contact = () => {
 
     return (
         <Layout>
+            <SEO title="Hubungi Kami" description="Hubungi tim Kagōunga untuk pertanyaan, saran, atau kerjasama. Kami siap membantu Anda 24/7." url="/contact" keywords="kontak kagounga, hubungi kami, customer service, alamat kagounga" />
             {/* Hero */}
             <section className="bg-gradient-to-br from-accent/10 via-background to-background py-16 sm:py-20">
                 <div className="container-page">

@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { Heart, CircleCheckBig, Users2, Orbit } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 // Mock Data for Core Attendant
 const teamMembers = [
@@ -42,6 +43,12 @@ const About = () => {
 
     return (
         <Layout>
+            <SEO
+                title="Tentang Kami"
+                description="Kenali lebih dekat Kagōunga — brand yang berdedikasi melestarikan warisan kuliner Maluku Utara melalui popeda instant berkualitas tinggi."
+                url="/about"
+                keywords="tentang kagounga, sejarah popeda, maluku utara, tim kagounga"
+            />
             {/* 1. Hero */}
             <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
                 <div className="container-page relative z-10 text-center">

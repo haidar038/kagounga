@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
+import { SEO } from "@/components/SEO";
 
 const authSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -182,6 +183,7 @@ const Auth = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
+            <SEO title="Masuk" description="Masuk atau daftar akun Kagōunga untuk melakukan pembelian dan menikmati berbagai fitur eksklusif." url="/auth" noindex={true} />
             {/* Header */}
             <header className="border-b border-border">
                 <div className="container-page py-4">
