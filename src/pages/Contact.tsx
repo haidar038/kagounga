@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { MapPin, Phone, Mail, Send, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SEO } from "@/components/SEO";
 
 const Contact = () => {
+    const { t } = useTranslation();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
@@ -18,7 +20,7 @@ const Contact = () => {
         e.preventDefault();
 
         if (!formData.name || !formData.email || !formData.message) {
-            toast.error("Mohon lengkapi semua field yang diperlukan");
+            toast.error(t("contact.requiredFieldsError"));
             return;
         }
 
@@ -27,8 +29,8 @@ const Contact = () => {
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        toast.success("Pesan terkirim!", {
-            description: "Kami akan segera menghubungi Anda.",
+        toast.success(t("contact.messageSent"), {
+            description: t("contact.messageSuccessDesc"),
         });
 
         setFormData({ name: "", email: "", subject: "", message: "" });
@@ -37,14 +39,19 @@ const Contact = () => {
 
     return (
         <Layout>
-            <SEO title="Hubungi Kami" description="Hubungi tim Kagōunga untuk pertanyaan, saran, atau kerjasama. Kami siap membantu Anda 24/7." url="/contact" keywords="kontak kagounga, hubungi kami, customer service, alamat kagounga" />
+            <SEO
+                title={t("contact.pageTitle")}
+                description="Hubungi tim Kagōunga untuk pertanyaan, saran, atau kerjasama. Kami siap membantu Anda 24/7."
+                url="/contact"
+                keywords="kontak kagounga, hubungi kami, customer service, alamat kagounga"
+            />
             {/* Hero */}
             <section className="bg-gradient-to-br from-accent/10 via-background to-background py-16 sm:py-20">
                 <div className="container-page">
                     <div className="mx-auto max-w-3xl text-center">
-                        <p className="section-label mb-4">Your experience was covered</p>
-                        <h1 className="font-heading text-4xl font-bold leading-tight sm:text-5xl">Contact Us</h1>
-                        <p className="mt-6 text-lg text-muted">Answers, even before you ask. We're on standby 24/7.</p>
+                        <p className="section-label mb-4">{t("contact.pageLabel")}</p>
+                        <h1 className="font-heading text-4xl font-bold leading-tight sm:text-5xl">{t("contact.pageTitle")}</h1>
+                        <p className="mt-6 text-lg text-muted">{t("contact.pageSubtitle")}</p>
                     </div>
                 </div>
             </section>
@@ -54,7 +61,7 @@ const Contact = () => {
                     <div className="grid gap-12 lg:grid-cols-3">
                         {/* Contact Info */}
                         <div className="space-y-6">
-                            <h2 className="font-heading text-2xl font-bold">Contact Information</h2>
+                            <h2 className="font-heading text-2xl font-bold">{t("contact.contactInfo")}</h2>
 
                             <div className="space-y-4">
                                 <div className="flex items-start gap-4 rounded-2xl border border-border bg-card p-4">
@@ -62,7 +69,7 @@ const Contact = () => {
                                         <MapPin className="h-5 w-5 text-primary-foreground" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold">Address</h3>
+                                        <h3 className="font-semibold">{t("contact.address")}</h3>
                                         <p className="mt-1 text-sm text-muted">
                                             Jl. Pertamina
                                             <br />
@@ -76,7 +83,7 @@ const Contact = () => {
                                         <Phone className="h-5 w-5 text-primary-foreground" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold">Phone</h3>
+                                        <h3 className="font-semibold">{t("contact.phone")}</h3>
                                         <p className="mt-1 text-sm text-muted">+62 812 3456 7890</p>
                                         <p className="text-xs text-muted">Monday - Friday, 09:00 - 17:00</p>
                                     </div>
@@ -87,9 +94,9 @@ const Contact = () => {
                                         <Mail className="h-5 w-5 text-primary-foreground" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold">Email</h3>
+                                        <h3 className="font-semibold">{t("contact.email")}</h3>
                                         <p className="mt-1 text-sm text-muted">halo@kagounga.id</p>
-                                        <p className="text-xs text-muted">Response within 24 hours</p>
+                                        <p className="text-xs text-muted">{t("contact.responseTime")}</p>
                                     </div>
                                 </div>
                             </div>
@@ -98,25 +105,25 @@ const Contact = () => {
                         {/* Contact Form */}
                         <div className="lg:col-span-2">
                             <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-                                <h2 className="font-heading text-2xl font-bold">Send Message</h2>
-                                <p className="mt-1 text-muted">Fill out the form below and we'll get back to you as soon as possible.</p>
+                                <h2 className="font-heading text-2xl font-bold">{t("contact.sendMessage")}</h2>
+                                <p className="mt-1 text-muted">{t("contact.formSubtitle")}</p>
 
                                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium">
-                                            Name <span className="text-destructive">*</span>
+                                            {t("contact.name")} <span className="text-destructive">*</span>
                                         </label>
                                         <input
                                             type="text"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition-colors focus:border-primary-border focus:ring-2 focus:ring-ring/20"
-                                            placeholder="Your Name"
+                                            placeholder={t("contact.yourName")}
                                         />
                                     </div>
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium">
-                                            Email <span className="text-destructive">*</span>
+                                            {t("contact.email")} <span className="text-destructive">*</span>
                                         </label>
                                         <input
                                             type="email"
@@ -127,25 +134,25 @@ const Contact = () => {
                                         />
                                     </div>
                                     <div className="sm:col-span-2">
-                                        <label className="mb-1.5 block text-sm font-medium">Subject</label>
+                                        <label className="mb-1.5 block text-sm font-medium">{t("contact.subject")}</label>
                                         <input
                                             type="text"
                                             value={formData.subject}
                                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                                             className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition-colors focus:border-primary-border focus:ring-2 focus:ring-ring/20"
-                                            placeholder="What would you like to ask?"
+                                            placeholder={t("contact.subjectPlaceholder")}
                                         />
                                     </div>
                                     <div className="sm:col-span-2">
                                         <label className="mb-1.5 block text-sm font-medium">
-                                            Message <span className="text-destructive">*</span>
+                                            {t("contact.message")} <span className="text-destructive">*</span>
                                         </label>
                                         <textarea
                                             value={formData.message}
                                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                             rows={5}
                                             className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm outline-none transition-colors focus:border-primary-border focus:ring-2 focus:ring-ring/20"
-                                            placeholder="Type your message here..."
+                                            placeholder={t("contact.messagePlaceholder")}
                                         />
                                     </div>
                                 </div>
@@ -154,12 +161,12 @@ const Contact = () => {
                                     {isSubmitting ? (
                                         <>
                                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                            Sending...
+                                            {t("contact.sending")}
                                         </>
                                     ) : (
                                         <>
                                             <Send className="mr-2 h-5 w-5" />
-                                            Send Message
+                                            {t("contact.sendMessage")}
                                         </>
                                     )}
                                 </Button>

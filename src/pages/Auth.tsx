@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, ArrowLeft, Loader2, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,37 +13,38 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { toast } from "sonner";
 import { SEO } from "@/components/SEO";
 
-const authSchema = z.object({
-    email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-const resetSchema = z.object({
-    email: z.string().email("Please enter a valid email address"),
-});
-
-const newPasswordSchema = z
-    .object({
-        password: z.string().min(6, "Password must be at least 6 characters"),
-        confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ["confirmPassword"],
-    });
-
-type AuthFormValues = z.infer<typeof authSchema>;
-type ResetFormValues = z.infer<typeof resetSchema>;
-type NewPasswordFormValues = z.infer<typeof newPasswordSchema>;
-
 type AuthMode = "login" | "signup" | "forgot" | "reset";
 
 const Auth = () => {
+    const { t } = useTranslation();
     const [mode, setMode] = useState<AuthMode>("login");
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { user, isLoading, signIn, signUp } = useAuth();
     const navigate = useNavigate();
+
+    const authSchema = z.object({
+        email: z.string().email(t("auth.validEmail")),
+        password: z.string().min(6, t("auth.passwordMinLength")),
+    });
+
+    const resetSchema = z.object({
+        email: z.string().email(t("auth.validEmail")),
+    });
+
+    const newPasswordSchema = z
+        .object({
+            password: z.string().min(6, t("auth.passwordMinLength")),
+            confirmPassword: z.string().min(6, t("auth.passwordMinLength")),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: t("auth.passwordsDontMatch"),
+            path: ["confirmPassword"],
+        });
+
+    type AuthFormValues = z.infer<typeof authSchema>;
+    type ResetFormValues = z.infer<typeof resetSchema>;
+    type NewPasswordFormValues = z.infer<typeof newPasswordSchema>;
 
     const form = useForm<AuthFormValues>({
         resolver: zodResolver(authSchema),
@@ -91,24 +93,24 @@ const Auth = () => {
                 const { error } = await signIn(values.email, values.password);
                 if (error) {
                     if (error.message.includes("Invalid login credentials")) {
-                        toast.error("Invalid email or password");
+                        toast.error(t("auth.invalidCredentials"));
                     } else {
                         toast.error(error.message);
                     }
                 } else {
-                    toast.success("Welcome back!");
+                    toast.success(t("auth.welcomeBack"));
                     navigate("/");
                 }
             } else if (mode === "signup") {
                 const { data, error } = await signUp(values.email, values.password);
                 if (error) {
                     if (error.message.includes("User already registered")) {
-                        toast.error("An account with this email already exists");
+                        toast.error(t("auth.userExists"));
                     } else {
                         toast.error(error.message);
                     }
                 } else {
-                    toast.success("Account created successfully! Please sign in.");
+                    toast.success(t("auth.accountCreated"));
                     setMode("login");
                     form.reset();
                 }
@@ -129,7 +131,7 @@ const Auth = () => {
             if (error) {
                 toast.error(error.message);
             } else {
-                toast.success("Password reset email sent! Check your inbox.");
+                toast.success(t("auth.resetEmailSent"));
                 setMode("login");
             }
         } finally {
@@ -148,7 +150,7 @@ const Auth = () => {
             if (error) {
                 toast.error(error.message);
             } else {
-                toast.success("Password updated successfully!");
+                toast.success(t("auth.passwordUpdated"));
                 // Clear the hash from URL
                 window.history.replaceState(null, "", window.location.pathname);
                 navigate("/");
@@ -169,13 +171,13 @@ const Auth = () => {
     const renderTitle = () => {
         switch (mode) {
             case "login":
-                return "Sign in to your account";
+                return t("auth.signInTitle");
             case "signup":
-                return "Create a new account";
+                return t("auth.signUpTitle");
             case "forgot":
-                return "Reset your password";
+                return t("auth.forgotTitle");
             case "reset":
-                return "Set a new password";
+                return t("auth.resetTitle");
             default:
                 return "";
         }
@@ -183,14 +185,14 @@ const Auth = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            <SEO title="Masuk" description="Masuk atau daftar akun Kagōunga untuk melakukan pembelian dan menikmati berbagai fitur eksklusif." url="/auth" noindex={true} />
+            <SEO title={t("auth.signIn")} description="Masuk atau daftar akun Kagōunga untuk melakukan pembelian dan menikmati berbagai fitur eksklusif." url="/auth" noindex={true} />
             {/* Header */}
             <header className="border-b border-border">
                 <div className="container-page py-4">
                     <Link to="/">
                         <Button variant="ghost" size="sm">
                             <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Home
+                            {t("common.backToHome")}
                         </Button>
                     </Link>
                 </div>
@@ -215,7 +217,7 @@ const Auth = () => {
                                         name="email"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Email</FormLabel>
+                                                <FormLabel>{t("auth.email")}</FormLabel>
                                                 <FormControl>
                                                     <Input type="email" placeholder="you@example.com" autoComplete="email" {...field} />
                                                 </FormControl>
@@ -230,7 +232,7 @@ const Auth = () => {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <div className="flex items-center justify-between">
-                                                    <FormLabel>Password</FormLabel>
+                                                    <FormLabel>{t("auth.password")}</FormLabel>
                                                     {mode === "login" && (
                                                         <button
                                                             type="button"
@@ -240,7 +242,7 @@ const Auth = () => {
                                                             }}
                                                             className="text-xs text-accent hover:underline"
                                                         >
-                                                            Forgot password?
+                                                            {t("auth.forgotPassword")}
                                                         </button>
                                                     )}
                                                 </div>
@@ -261,12 +263,12 @@ const Auth = () => {
                                         {isSubmitting ? (
                                             <>
                                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                {mode === "login" ? "Signing in..." : "Creating account..."}
+                                                {mode === "login" ? t("auth.signingIn") : t("auth.creatingAccount")}
                                             </>
                                         ) : mode === "login" ? (
-                                            "Sign In"
+                                            t("auth.signIn")
                                         ) : (
-                                            "Create Account"
+                                            t("auth.createAccount")
                                         )}
                                     </Button>
                                 </form>
@@ -282,7 +284,7 @@ const Auth = () => {
                                         name="email"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Email</FormLabel>
+                                                <FormLabel>{t("auth.email")}</FormLabel>
                                                 <FormControl>
                                                     <Input type="email" placeholder="you@example.com" autoComplete="email" {...field} />
                                                 </FormControl>
@@ -295,12 +297,12 @@ const Auth = () => {
                                         {isSubmitting ? (
                                             <>
                                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                Sending...
+                                                {t("auth.sending")}
                                             </>
                                         ) : (
                                             <>
                                                 <Mail className="h-4 w-4 mr-2" />
-                                                Send Reset Link
+                                                {t("auth.sendResetLink")}
                                             </>
                                         )}
                                     </Button>
@@ -317,7 +319,7 @@ const Auth = () => {
                                         name="password"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>New Password</FormLabel>
+                                                <FormLabel>{t("auth.newPassword")}</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
                                                         <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" {...field} />
@@ -336,7 +338,7 @@ const Auth = () => {
                                         name="confirmPassword"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Confirm Password</FormLabel>
+                                                <FormLabel>{t("auth.confirmPassword")}</FormLabel>
                                                 <FormControl>
                                                     <Input type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" {...field} />
                                                 </FormControl>
@@ -349,10 +351,10 @@ const Auth = () => {
                                         {isSubmitting ? (
                                             <>
                                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                Updating...
+                                                {t("auth.updating")}
                                             </>
                                         ) : (
-                                            "Update Password"
+                                            t("auth.updatePassword")
                                         )}
                                     </Button>
                                 </form>
@@ -363,7 +365,7 @@ const Auth = () => {
                         <div className="mt-6 text-center">
                             {(mode === "login" || mode === "signup") && (
                                 <p className="text-sm text-muted">
-                                    {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
+                                    {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -372,20 +374,20 @@ const Auth = () => {
                                         }}
                                         className="text-accent hover:underline font-medium"
                                     >
-                                        {mode === "login" ? "Sign up" : "Sign in"}
+                                        {mode === "login" ? t("auth.signUp") : t("auth.signIn")}
                                     </button>
                                 </p>
                             )}
                             {mode === "forgot" && (
                                 <button type="button" onClick={() => setMode("login")} className="text-sm text-accent hover:underline font-medium">
-                                    Back to sign in
+                                    {t("auth.backToSignIn")}
                                 </button>
                             )}
                         </div>
                     </div>
 
                     {/* Admin note */}
-                    {(mode === "login" || mode === "signup") && <p className="text-center text-sm text-muted mt-6">Admin access is required to manage content.</p>}
+                    {(mode === "login" || mode === "signup") && <p className="text-center text-sm text-muted mt-6">{t("auth.adminNote")}</p>}
                 </div>
             </main>
         </div>

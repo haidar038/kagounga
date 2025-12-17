@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 import { Wheat, Timer, HeartPulse, UtensilsCrossed, Star, Sprout, Soup, LucideIcon } from "lucide-react";
 
 // Icon mapping
@@ -22,6 +23,8 @@ interface SignaturePoint {
 }
 
 export function SignatureProduct() {
+    const { t } = useTranslation();
+
     const { data: points, isLoading } = useQuery({
         queryKey: ["signature-points"],
         queryFn: async () => {
@@ -59,8 +62,8 @@ export function SignatureProduct() {
             <div className="container-page">
                 {/* Section Header */}
                 <div className="text-center mb-12">
-                    <p className="section-label mb-3">Why Choose Us</p>
-                    <h2 className="font-heading text-3xl font-bold sm:text-4xl">Signature of Popeda Instant</h2>
+                    <p className="section-label mb-3">{t("home.whyChooseUs")}</p>
+                    <h2 className="font-heading text-3xl font-bold sm:text-4xl">{t("home.signatureTitle")}</h2>
                 </div>
 
                 {/* Points Grid */}

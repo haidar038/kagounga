@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +15,8 @@ interface MissionContent {
 }
 
 export function MissionCard() {
+    const { t } = useTranslation();
+
     const { data: mission, isLoading } = useQuery({
         queryKey: ["mission-content"],
         queryFn: async () => {
@@ -53,13 +56,13 @@ export function MissionCard() {
                     <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                         {/* Content */}
                         <div className="order-2 lg:order-1">
-                            <p className="section-label mb-3">Our Mission</p>
+                            <p className="section-label mb-3">{t("home.ourMission")}</p>
                             <h2 className="font-heading text-3xl font-bold sm:text-4xl mb-6">{mission.heading}</h2>
                             <p className="text-muted leading-relaxed text-lg mb-8">{mission.paragraph}</p>
                             {mission.cta_url && (
                                 <Button asChild variant="hero" size="lg">
                                     <Link to={mission.cta_url}>
-                                        {mission.cta_text || "Learn More"}
+                                        {mission.cta_text || t("common.learnMore")}
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </Link>
                                 </Button>

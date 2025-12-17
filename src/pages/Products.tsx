@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search, Filter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/product/ProductCard";
 import { mockProducts, categories } from "@/data/products";
@@ -8,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { SEO } from "@/components/SEO";
 
 const Products = () => {
+    const { t } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("popular");
@@ -48,7 +50,7 @@ const Products = () => {
     return (
         <Layout>
             <SEO
-                title="Produk"
+                title={t("products.pageTitle")}
                 description="Jelajahi koleksi lengkap produk Kagōunga Popeda Instant. Temukan berbagai varian popeda dan makanan tradisional Maluku Utara."
                 url="/products"
                 keywords="popeda instant, produk kagounga, makanan maluku, popeda sagu"
@@ -57,9 +59,9 @@ const Products = () => {
                 {/* Header */}
                 <section className="bg-secondary/30 py-12 sm:py-16">
                     <div className="container-page">
-                        <p className="section-label mb-2">Our Collection</p>
-                        <h1 className="font-heading text-3xl font-bold sm:text-4xl lg:text-5xl">All Products</h1>
-                        <p className="mt-3 max-w-xl text-muted">Discover our varied selection of premium popeda and complements.</p>
+                        <p className="section-label mb-2">{t("products.pageLabel")}</p>
+                        <h1 className="font-heading text-3xl font-bold sm:text-4xl lg:text-5xl">{t("products.pageTitle")}</h1>
+                        <p className="mt-3 max-w-xl text-muted">{t("products.pageSubtitle")}</p>
                     </div>
                 </section>
 
@@ -71,7 +73,7 @@ const Products = () => {
                             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
                             <input
                                 type="text"
-                                placeholder="Search products..."
+                                placeholder={t("products.searchPlaceholder")}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-primary-border focus:ring-2 focus:ring-ring/20"
@@ -82,10 +84,10 @@ const Products = () => {
                         <div className="flex items-center gap-2">
                             <Filter className="h-5 w-5 text-muted" />
                             <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary-border">
-                                <option value="popular">Most Popular</option>
-                                <option value="price-low">Price: Low to High</option>
-                                <option value="price-high">Price: High to Low</option>
-                                <option value="rating">Top Rated</option>
+                                <option value="popular">{t("products.mostPopular")}</option>
+                                <option value="price-low">{t("products.priceLowHigh")}</option>
+                                <option value="price-high">{t("products.priceHighLow")}</option>
+                                <option value="rating">{t("products.topRated")}</option>
                             </select>
                         </div>
                     </div>
@@ -106,7 +108,7 @@ const Products = () => {
                     </div>
 
                     {/* Results count */}
-                    <p className="mb-6 text-sm text-muted">Showing {filteredProducts.length} products</p>
+                    <p className="mb-6 text-sm text-muted">{t("products.showingProducts", { count: filteredProducts.length })}</p>
 
                     {/* Products Grid */}
                     {filteredProducts.length > 0 ? (
@@ -120,8 +122,8 @@ const Products = () => {
                     ) : (
                         <div className="rounded-2xl border border-border bg-card py-16 text-center">
                             <p className="text-4xl">🔍</p>
-                            <h3 className="mt-4 font-heading text-lg font-semibold">No products found</h3>
-                            <p className="mt-2 text-muted">Try changing your filters or search terms.</p>
+                            <h3 className="mt-4 font-heading text-lg font-semibold">{t("products.noProductsFound")}</h3>
+                            <p className="mt-2 text-muted">{t("products.noProductsDesc")}</p>
                             <Button
                                 variant="outline"
                                 className="mt-4"
@@ -130,7 +132,7 @@ const Products = () => {
                                     setSearchQuery("");
                                 }}
                             >
-                                Reset Filter
+                                {t("products.resetFilter")}
                             </Button>
                         </div>
                     )}

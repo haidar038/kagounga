@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Calendar, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -18,6 +20,8 @@ interface NewsPost {
 }
 
 const News = () => {
+    const { t, i18n } = useTranslation();
+
     const { data: posts, isLoading } = useQuery({
         queryKey: ["news-posts"],
         queryFn: async () => {
@@ -28,10 +32,13 @@ const News = () => {
         },
     });
 
+    // Get the correct locale for date formatting
+    const dateLocale = i18n.language === "id" ? idLocale : enUS;
+
     return (
         <Layout>
             <SEO
-                title="Berita & Artikel"
+                title={t("news.pageTitle")}
                 description="Baca berita terbaru, cerita, dan artikel menarik dari Kagōunga seputar popeda, kuliner Maluku Utara, dan budaya lokal."
                 url="/news"
                 keywords="berita kagounga, artikel popeda, news maluku utara, cerita kuliner"
@@ -39,9 +46,9 @@ const News = () => {
             {/* Hero */}
             <section className="bg-secondary/30 py-16 sm:py-20">
                 <div className="container-page text-center">
-                    <p className="section-label mb-3">Latest Updates</p>
-                    <h1 className="font-heading text-4xl font-bold sm:text-5xl">News & Stories</h1>
-                    <p className="mt-4 text-lg text-muted max-w-2xl mx-auto">Stay updated with the latest news, events, and stories from Kagōunga.</p>
+                    <p className="section-label mb-3">{t("news.pageLabel")}</p>
+                    <h1 className="font-heading text-4xl font-bold sm:text-5xl">{t("news.pageTitle")}</h1>
+                    <p className="mt-4 text-lg text-muted max-w-2xl mx-auto">{t("news.pageSubtitle")}</p>
                 </div>
             </section>
 
@@ -79,13 +86,13 @@ const News = () => {
                                         {post.published_at && (
                                             <div className="flex items-center gap-2 text-sm text-muted mb-3">
                                                 <Calendar className="h-4 w-4" />
-                                                <time dateTime={post.published_at}>{format(new Date(post.published_at), "d MMMM yyyy", { locale: idLocale })}</time>
+                                                <time dateTime={post.published_at}>{format(new Date(post.published_at), "d MMMM yyyy", { locale: dateLocale })}</time>
                                             </div>
                                         )}
                                         <h2 className="font-heading text-xl font-semibold group-hover:text-accent transition-colors line-clamp-2">{post.title}</h2>
                                         {post.excerpt && <p className="mt-2 text-muted line-clamp-2">{post.excerpt}</p>}
                                         <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent">
-                                            Read more <ArrowRight className="h-4 w-4" />
+                                            {t("common.readMore")} <ArrowRight className="h-4 w-4" />
                                         </span>
                                     </div>
                                 </Link>
@@ -94,7 +101,7 @@ const News = () => {
                     ) : (
                         <div className="text-center py-16">
                             <p className="text-4xl mb-4">📭</p>
-                            <p className="text-muted">No news posts yet. Check back soon!</p>
+                            <p className="text-muted">{t("news.noPostsYet")}</p>
                         </div>
                     )}
                 </div>

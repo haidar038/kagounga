@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export function Footer() {
+    const { t } = useTranslation();
+
     return (
         <footer className="border-t border-border bg-surface">
             <div className="container-page py-12">
@@ -13,8 +17,8 @@ export function Footer() {
                             <span className="font-heading text-xl font-semibold">Kagōunga</span>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-sm uppercase text-muted font-semibold">Move, Moreover!</p>
-                            <p className="text-sm text-muted">We transcend all boundaries, imaginable.</p>
+                            <p className="text-sm uppercase text-muted font-semibold">{t("footer.tagline")}</p>
+                            <p className="text-sm text-muted">{t("footer.description")}</p>
                         </div>
                         <div className="flex gap-3">
                             <a target="_blank" href="https://www.instagram.com/kagounga.id/" className="rounded-lg bg-secondary p-2 text-muted transition-colors hover:text-foreground">
@@ -37,26 +41,26 @@ export function Footer() {
 
                     {/* Quick Links */}
                     <div className="space-y-4">
-                        <h4 className="font-heading font-semibold">Navigasi</h4>
+                        <h4 className="font-heading font-semibold">{t("footer.navigation")}</h4>
                         <ul className="space-y-2 text-sm">
                             <li>
                                 <Link to="/about" className="text-muted transition-colors hover:text-foreground">
-                                    About
+                                    {t("nav.about")}
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/news" className="text-muted transition-colors hover:text-foreground">
-                                    News
+                                    {t("nav.news")}
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/contact" className="text-muted transition-colors hover:text-foreground">
-                                    Contact
+                                    {t("nav.contact")}
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/products" className="text-muted transition-colors hover:text-foreground">
-                                    Products
+                                    {t("nav.products")}
                                 </Link>
                             </li>
                         </ul>
@@ -64,7 +68,7 @@ export function Footer() {
 
                     {/* Contact */}
                     <div className="space-y-4">
-                        <h4 className="font-heading font-semibold">Kontak</h4>
+                        <h4 className="font-heading font-semibold">{t("footer.contactTitle")}</h4>
                         <ul className="space-y-3 text-sm">
                             <li className="flex items-start gap-2 text-muted">
                                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
@@ -80,34 +84,21 @@ export function Footer() {
                             </li>
                         </ul>
                     </div>
-
-                    {/* Newsletter */}
-                    {/* <div className="space-y-4">
-                        <h4 className="font-heading font-semibold">Newsletter</h4>
-                        <p className="text-sm text-muted">Dapatkan info promo dan produk terbaru.</p>
-                        <form className="flex gap-2">
-                            <input
-                                type="email"
-                                placeholder="Email Anda"
-                                className="flex-1 rounded-xl border border-border bg-background px-4 py-2 text-sm outline-none transition-colors focus:border-primary-border focus:ring-2 focus:ring-ring/20"
-                            />
-                            <button type="submit" className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90">
-                                Kirim
-                            </button>
-                        </form>
-                    </div> */}
                 </div>
 
                 {/* Bottom */}
                 <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-sm text-muted md:flex-row">
-                    <p>&copy; {new Date().getFullYear()} Kagōunga. All rights reserved.</p>
-                    <div className="flex gap-6">
+                    <p>
+                        &copy; {new Date().getFullYear()} Kagōunga. {t("footer.allRightsReserved")}
+                    </p>
+                    <div className="flex items-center gap-6">
                         <Link to="/privacy" className="transition-colors hover:text-foreground">
-                            Kebijakan Privasi
+                            {t("footer.privacyPolicy")}
                         </Link>
                         <Link to="/terms" className="transition-colors hover:text-foreground">
-                            Syarat & Ketentuan
+                            {t("footer.termsConditions")}
                         </Link>
+                        <LanguageSwitcher />
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +14,8 @@ interface CTAContent {
 }
 
 export function CTASection() {
+    const { t } = useTranslation();
+
     const { data: cta, isLoading } = useQuery({
         queryKey: ["cta-content"],
         queryFn: async () => {
@@ -50,7 +53,7 @@ export function CTASection() {
                     {cta.button_url && (
                         <Button asChild size="xl" className="mt-8 bg-primary text-slate-800 hover:bg-primary/90 font-semibold">
                             <Link to={cta.button_url} target="_blank">
-                                {cta.button_text || "Get Started"}
+                                {cta.button_text || t("common.getStarted")}
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Link>
                         </Button>

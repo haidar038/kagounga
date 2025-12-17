@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Menu, X, Search, User, LogOut, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,19 +9,20 @@ import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/news", label: "News" },
-    { href: "/contact", label: "Contact" },
-    { href: "/products", label: "Product" },
-];
-
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { totalItems } = useCart();
     const { user, isAdmin, signOut } = useAuth();
+    const { t } = useTranslation();
+
+    const navLinks = [
+        { href: "/", label: t("nav.home") },
+        { href: "/about", label: t("nav.about") },
+        { href: "/news", label: t("nav.news") },
+        { href: "/contact", label: t("nav.contact") },
+        { href: "/products", label: t("nav.product") },
+    ];
 
     const handleSignOut = async () => {
         await signOut();
@@ -85,19 +87,19 @@ export function Navbar() {
                                                 <DropdownMenuItem asChild>
                                                     <Link to="/admin" className="cursor-pointer">
                                                         <Shield className="h-4 w-4 mr-2" />
-                                                        Admin Dashboard
+                                                        {t("nav.adminDashboard")}
                                                     </Link>
                                                 </DropdownMenuItem>
                                             )}
                                             <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                                                 <LogOut className="h-4 w-4 mr-2" />
-                                                Sign Out
+                                                {t("nav.signOut")}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 ) : (
                                     <Link to="/auth">
-                                        <Button>Mulai</Button>
+                                        <Button>{t("nav.getStarted")}</Button>
                                     </Link>
                                 )}
                             </div>
@@ -121,7 +123,7 @@ export function Navbar() {
                                 <>
                                     {isAdmin && (
                                         <Link to="/admin" className="rounded-lg px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-secondary" onClick={() => setIsOpen(false)}>
-                                            Admin Dashboard
+                                            {t("nav.adminDashboard")}
                                         </Link>
                                     )}
                                     <button
@@ -131,12 +133,12 @@ export function Navbar() {
                                         }}
                                         className="rounded-lg px-3 py-2 text-left text-sm font-medium text-destructive transition-colors hover:bg-secondary"
                                     >
-                                        Sign Out
+                                        {t("nav.signOut")}
                                     </button>
                                 </>
                             ) : (
                                 <Link to="/auth" className="rounded-sm px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-secondary hover:text-foreground" onClick={() => setIsOpen(false)}>
-                                    Mulai
+                                    {t("nav.getStarted")}
                                 </Link>
                             )}
                         </div>
