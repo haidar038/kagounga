@@ -82,6 +82,10 @@ const handler = async (req: Request): Promise<Response> => {
 
         // 5. Create Order in Database
         console.log("Creating order in database...");
+
+        // Generate tracking token for guest order tracking
+        const trackingToken = crypto.randomUUID(); // Cryptographically secure
+
         const { data: orderData, error: orderError } = await supabase
             .from("orders")
             .insert({
@@ -95,6 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
                 shipping_address: shippingAddress || "",
                 city: city || "",
                 postal_code: postalCode || "",
+                tracking_token: trackingToken, // Add tracking token
             })
             .select()
             .single();

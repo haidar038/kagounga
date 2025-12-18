@@ -31,9 +31,9 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         const payload = await req.json();
-        console.log("Webhook payload:", JSON.stringify(payload, null, 2));
+        console.log("Webhook payload received");
 
-        const { external_id, status } = payload;
+        const { external_id, status, paid_amount, created } = payload;
 
         if (!external_id || !status) {
             console.error("Missing external_id or status");
@@ -41,6 +41,45 @@ const handler = async (req: Request): Promise<Response> => {
                 status: 400,
                 headers: corsHeaders,
             });
+        }
+
+        // Security Enhancement 1: Timestamp Validation (Prevent Replay Attacks)
+        if (created) {
+            const webhookTimestamp = new Date(created).getTime();
+            const now = Date.now();
+            const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+            if (Math.abs(now - webhookTimestamp) > fiveMinutes) {
+                console.error("Webhook timestamp is too old or in the future");
+                return new Response("Webhook expired", {
+                    status: 400,
+                    headers: corsHeaders,
+                });
+            }
+        }
+
+        // Security Enhancement 2: Verify order exists and amount matches
+        const { data: existingOrder, error: fetchError } = await supabase.from("orders").select("id, total_amount, status").eq("id", external_id).single();
+
+        if (fetchError || !existingOrder) {
+            console.error("Order not found:", external_id);
+            return new Response("Order not found", {
+                status: 404,
+                headers: corsHeaders,
+            });
+        }
+
+        // Amount verification - only for PAID status
+        if (status === "PAID" || status === "SETTLED") {
+            if (paid_amount && Math.abs(paid_amount - existingOrder.total_amount) > 1) {
+                // Allow 1 IDR tolerance for rounding
+                console.error("Amount mismatch - possible fraud attempt", {
+                    expected: existingOrder.total_amount,
+                    received: paid_amount,
+                });
+                // Log security incident but don't fail - notify admin instead
+                // TODO: Send alert to admin
+            }
         }
 
         // Map Xendit status to our DB status

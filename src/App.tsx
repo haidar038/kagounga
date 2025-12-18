@@ -22,6 +22,7 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import TrackOrder from "./pages/TrackOrder";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
                                 />
                                 <Route path="/privacy" element={<PrivacyPolicy />} />
                                 <Route path="/terms" element={<TermsAndConditions />} />
+                                <Route path="/track-order" element={<TrackOrder />} />
                                 <Route path="*" element={<NotFound />} />
                             </Routes>
                         </BrowserRouter>
