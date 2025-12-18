@@ -20,12 +20,6 @@ export default defineConfig(({ mode }) => ({
                 manualChunks: {
                     // React core
                     "react-vendor": ["react", "react-dom", "react-router-dom"],
-
-                    // UI libraries (adjust based on what you're using)
-                    "ui-vendor": ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu"], // example
-
-                    // Other large libraries
-                    "utils-vendor": ["lodash", "date-fns", "axios"], // example
                 },
             },
         },
