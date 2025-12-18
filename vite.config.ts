@@ -13,17 +13,14 @@ export default defineConfig(({ mode }) => ({
         alias: {
             "@": path.resolve(__dirname, "./src"),
         },
-        dedupe: ["react", "react-dom", "react-router-dom"],
+    },
+    optimizeDeps: {
+        include: ["react", "react-dom", "react-router-dom"],
     },
     build: {
         rollupOptions: {
             output: {
                 manualChunks: (id) => {
-                    // React core libraries
-                    if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router-dom") || id.includes("node_modules/scheduler")) {
-                        return "react-vendor";
-                    }
-
                     // Radix UI components
                     if (id.includes("node_modules/@radix-ui")) {
                         return "radix-ui";
@@ -59,7 +56,7 @@ export default defineConfig(({ mode }) => ({
                         return "utils-vendor";
                     }
 
-                    // Other node_modules
+                    // Other node_modules (but React will be bundled separately by Vite)
                     if (id.includes("node_modules")) {
                         return "vendor";
                     }
