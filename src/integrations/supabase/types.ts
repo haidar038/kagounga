@@ -162,6 +162,44 @@ export type Database = {
         }
         Relationships: []
       }
+      order_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string | null
+          field_changed: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          order_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string | null
+          field_changed: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          order_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string | null
+          field_changed?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -200,59 +238,231 @@ export type Database = {
           },
         ]
       }
+      order_notes: {
+        Row: {
+          admin_id: string | null
+          created_at: string | null
+          id: string
+          is_internal: boolean | null
+          note: string
+          order_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          note: string
+          order_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_internal?: boolean | null
+          note?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           city: string
+          courier: string | null
           created_at: string | null
           customer_email: string
           customer_name: string
           customer_phone: string
+          delivered_at: string | null
+          estimated_delivery: string | null
           external_id: string | null
           id: string
           invoice_url: string | null
           postal_code: string
+          shipped_at: string | null
           shipping_address: string
           shipping_cost: number
           status: string
           total_amount: number
+          tracking_access_expires_at: string | null
+          tracking_access_token: string | null
+          tracking_number: string | null
+          tracking_token: string | null
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
           city: string
+          courier?: string | null
           created_at?: string | null
           customer_email: string
           customer_name: string
           customer_phone: string
+          delivered_at?: string | null
+          estimated_delivery?: string | null
           external_id?: string | null
           id?: string
           invoice_url?: string | null
           postal_code: string
+          shipped_at?: string | null
           shipping_address: string
           shipping_cost?: number
           status?: string
           total_amount: number
+          tracking_access_expires_at?: string | null
+          tracking_access_token?: string | null
+          tracking_number?: string | null
+          tracking_token?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           city?: string
+          courier?: string | null
           created_at?: string | null
           customer_email?: string
           customer_name?: string
           customer_phone?: string
+          delivered_at?: string | null
+          estimated_delivery?: string | null
           external_id?: string | null
           id?: string
           invoice_url?: string | null
           postal_code?: string
+          shipped_at?: string | null
           shipping_address?: string
           shipping_cost?: number
           status?: string
           total_amount?: number
+          tracking_access_expires_at?: string | null
+          tracking_access_token?: string | null
+          tracking_number?: string | null
+          tracking_token?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
+      }
+      product_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          icon: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          icon: string
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string
+          id: string
+          image: string
+          images: string[] | null
+          is_active: boolean
+          long_description: string | null
+          name: string
+          nutrition_calories: number | null
+          nutrition_carbs: number | null
+          nutrition_fat: number | null
+          nutrition_protein: number | null
+          original_price: number | null
+          prep_time: string | null
+          price: number
+          rating: number
+          reviews: number
+          serving_size: string | null
+          slug: string
+          stock: number
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description: string
+          id?: string
+          image: string
+          images?: string[] | null
+          is_active?: boolean
+          long_description?: string | null
+          name: string
+          nutrition_calories?: number | null
+          nutrition_carbs?: number | null
+          nutrition_fat?: number | null
+          nutrition_protein?: number | null
+          original_price?: number | null
+          prep_time?: string | null
+          price: number
+          rating?: number
+          reviews?: number
+          serving_size?: string | null
+          slug: string
+          stock?: number
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          image?: string
+          images?: string[] | null
+          is_active?: boolean
+          long_description?: string | null
+          name?: string
+          nutrition_calories?: number | null
+          nutrition_carbs?: number | null
+          nutrition_fat?: number | null
+          nutrition_protein?: number | null
+          original_price?: number | null
+          prep_time?: string | null
+          price?: number
+          rating?: number
+          reviews?: number
+          serving_size?: string | null
+          slug?: string
+          stock?: number
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       signature_points: {
         Row: {
@@ -310,6 +520,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_order_for_tracking: {
+        Args: { p_access_token: string }
+        Returns: {
+          city: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          postal_code: string
+          shipping_address: string
+          shipping_cost: number
+          status: string
+          total_amount: number
+          updated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

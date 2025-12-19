@@ -1,3 +1,10 @@
+/**
+ * @deprecated This file contains static product data and is no longer used in the application.
+ * Products are now loaded from the Supabase database using the useProducts hook.
+ * This file is kept for reference and can be removed in a future cleanup.
+ * Migration date: 2025-12-19
+ */
+
 import { Product } from "@/types/product";
 
 export const mockProducts: Product[] = [

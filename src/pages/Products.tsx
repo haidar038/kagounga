@@ -1,21 +1,23 @@
 import { useState, useMemo } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Layout } from "@/components/layout/Layout";
 import { ProductCard } from "@/components/product/ProductCard";
-import { mockProducts, categories } from "@/data/products";
+import { useProducts, useProductCategories } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SEO } from "@/components/SEO";
 
 const Products = () => {
     const { t } = useTranslation();
+    const { products, loading: productsLoading, error: productsError } = useProducts();
+    const { categories, loading: categoriesLoading } = useProductCategories();
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("popular");
 
     const filteredProducts = useMemo(() => {
-        let filtered = mockProducts;
+        let filtered = products;
 
         // Filter by category
         if (selectedCategory !== "all") {
@@ -45,7 +47,7 @@ const Products = () => {
         }
 
         return filtered;
-    }, [selectedCategory, searchQuery, sortBy]);
+    }, [products, selectedCategory, searchQuery, sortBy]);
 
     return (
         <Layout>
@@ -66,6 +68,15 @@ const Products = () => {
                 </section>
 
                 <div className="container-page py-8 sm:py-12">
+                    {/* Error State */}
+                    {productsError && (
+                        <div className="mb-8 rounded-2xl border border-destructive/50 bg-destructive/10 p-6 text-center">
+                            <p className="text-4xl">⚠️</p>
+                            <h3 className="mt-4 font-heading text-lg font-semibold">Terjadi Kesalahan</h3>
+                            <p className="mt-2 text-sm text-muted">{productsError}</p>
+                        </div>
+                    )}
+
                     {/* Filters */}
                     <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         {/* Search */}
@@ -77,13 +88,19 @@ const Products = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full rounded-xl border border-border bg-surface py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-primary-border focus:ring-2 focus:ring-ring/20"
+                                disabled={productsLoading}
                             />
                         </div>
 
                         {/* Sort */}
                         <div className="flex items-center gap-2">
                             <Filter className="h-5 w-5 text-muted" />
-                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary-border">
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary-border"
+                                disabled={productsLoading}
+                            >
                                 <option value="popular">{t("products.mostPopular")}</option>
                                 <option value="price-low">{t("products.priceLowHigh")}</option>
                                 <option value="price-high">{t("products.priceHighLow")}</option>
@@ -93,48 +110,71 @@ const Products = () => {
                     </div>
 
                     {/* Categories */}
-                    <div className="mb-8 flex flex-wrap gap-2">
-                        {categories.map((cat) => (
-                            <Button
-                                key={cat.id}
-                                variant={selectedCategory === cat.id ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => setSelectedCategory(cat.id)}
-                                className={cn("rounded-lg px-4 font-semibold text-foreground/80 hover:text-foreground hover:border-foreground/50", selectedCategory === cat.id && "text-primary-foreground shadow-sm")}
-                            >
-                                {cat.name}
-                            </Button>
-                        ))}
-                    </div>
-
-                    {/* Results count */}
-                    <p className="mb-6 text-sm text-muted">{t("products.showingProducts", { count: filteredProducts.length })}</p>
-
-                    {/* Products Grid */}
-                    {filteredProducts.length > 0 ? (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {filteredProducts.map((product, index) => (
-                                <div key={product.id} className="animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
-                                    <ProductCard product={product} />
-                                </div>
+                    {categoriesLoading ? (
+                        <div className="mb-8 flex gap-2">
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="h-9 w-24 animate-pulse rounded-lg bg-secondary" />
                             ))}
                         </div>
                     ) : (
-                        <div className="rounded-2xl border border-border bg-card py-16 text-center">
-                            <p className="text-4xl">🔍</p>
-                            <h3 className="mt-4 font-heading text-lg font-semibold">{t("products.noProductsFound")}</h3>
-                            <p className="mt-2 text-muted">{t("products.noProductsDesc")}</p>
-                            <Button
-                                variant="outline"
-                                className="mt-4"
-                                onClick={() => {
-                                    setSelectedCategory("all");
-                                    setSearchQuery("");
-                                }}
-                            >
-                                {t("products.resetFilter")}
-                            </Button>
+                        <div className="mb-8 flex flex-wrap gap-2">
+                            {categories.map((cat) => (
+                                <Button
+                                    key={cat.id}
+                                    variant={selectedCategory === cat.id ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setSelectedCategory(cat.id)}
+                                    className={cn("rounded-lg px-4 font-semibold text-foreground/80 hover:text-foreground hover:border-foreground/50", selectedCategory === cat.id && "text-primary-foreground shadow-sm")}
+                                    disabled={productsLoading}
+                                >
+                                    {cat.name}
+                                </Button>
+                            ))}
                         </div>
+                    )}
+
+                    {/* Results count */}
+                    {!productsLoading && <p className="mb-6 text-sm text-muted">{t("products.showingProducts", { count: filteredProducts.length })}</p>}
+
+                    {/* Loading State */}
+                    {productsLoading && (
+                        <div className="flex min-h-[400px] items-center justify-center">
+                            <div className="text-center">
+                                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+                                <p className="mt-4 text-muted">Memuat produk...</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Products Grid */}
+                    {!productsLoading && !productsError && (
+                        <>
+                            {filteredProducts.length > 0 ? (
+                                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    {filteredProducts.map((product, index) => (
+                                        <div key={product.id} className="animate-scale-in" style={{ animationDelay: `${index * 50}ms` }}>
+                                            <ProductCard product={product} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="rounded-2xl border border-border bg-card py-16 text-center">
+                                    <p className="text-4xl">🔍</p>
+                                    <h3 className="mt-4 font-heading text-lg font-semibold">{t("products.noProductsFound")}</h3>
+                                    <p className="mt-2 text-muted">{t("products.noProductsDesc")}</p>
+                                    <Button
+                                        variant="outline"
+                                        className="mt-4"
+                                        onClick={() => {
+                                            setSelectedCategory("all");
+                                            setSearchQuery("");
+                                        }}
+                                    >
+                                        {t("products.resetFilter")}
+                                    </Button>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

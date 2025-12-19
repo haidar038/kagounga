@@ -30,3 +30,5 @@ dbsecret.txt
 
 supabase/.temp
 database
+
+.agent

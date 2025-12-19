@@ -1,18 +1,53 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Star, Minus, Plus, ShoppingCart, Truck, ShieldCheck, Clock } from "lucide-react";
+import { ArrowLeft, Star, Minus, Plus, ShoppingCart, Truck, ShieldCheck, Clock, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockProducts } from "@/data/products";
+import { useProduct } from "@/hooks/useProducts";
 import { useCart } from "@/contexts/CartContext";
 import { SEO, ProductSchema, BreadcrumbSchema } from "@/components/SEO";
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
-    const product = mockProducts.find((p) => p.slug === slug);
+    const { product, loading, error } = useProduct(slug);
     const [quantity, setQuantity] = useState(1);
     const { addItem } = useCart();
+
+    // Loading state
+    if (loading) {
+        return (
+            <Layout>
+                <SEO title="Memuat Produk..." description="Memuat detail produk..." noindex={true} />
+                <div className="container-page flex min-h-screen items-center justify-center py-20">
+                    <div className="text-center">
+                        <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+                        <p className="mt-4 text-muted">Memuat detail produk...</p>
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <Layout>
+                <SEO title="Terjadi Kesalahan" description="Gagal memuat produk" noindex={true} />
+                <div className="container-page py-20 text-center">
+                    <p className="text-6xl">⚠️</p>
+                    <h1 className="mt-4 font-heading text-2xl font-bold">Terjadi Kesalahan</h1>
+                    <p className="mt-2 text-muted">{error}</p>
+                    <Button asChild className="mt-6">
+                        <Link to="/products">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Kembali ke Produk
+                        </Link>
+                    </Button>
+                </div>
+            </Layout>
+        );
+    }
 
     if (!product) {
         return (
