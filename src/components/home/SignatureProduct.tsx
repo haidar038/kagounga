@@ -58,7 +58,7 @@ export function SignatureProduct() {
     }
 
     return (
-        <section className="py-16 sm:py-20 bg-background">
+        <section className="py-16 sm:py-20 bg-secondary/30">
             <div className="container-page">
                 {/* Section Header */}
                 <div className="text-center mb-12">

@@ -52,8 +52,8 @@ export function CTASection() {
                     {cta.description && <p className="mt-4 text-lg text-accent-foreground/80 max-w-2xl mx-auto">{cta.description}</p>}
                     {cta.button_url && (
                         <Button asChild size="xl" className="mt-8 bg-primary text-slate-800 hover:bg-primary/90 font-semibold">
-                            <Link to={cta.button_url} target="_blank">
-                                {cta.button_text || t("common.getStarted")}
+                            <Link to={cta.button_url}>
+                                {cta.button_text || t("common.learnMore")}
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Link>
                         </Button>
