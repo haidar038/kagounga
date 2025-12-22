@@ -152,7 +152,8 @@ const TrackOrder = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`, // ✅ Explicit anon key
+                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, // Required for edge function authentication
                 },
                 body: JSON.stringify({
                     email: email,
