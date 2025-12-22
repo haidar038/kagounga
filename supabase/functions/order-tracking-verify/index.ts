@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-tracking-token",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 interface VerifyRequest {
@@ -14,8 +15,12 @@ interface VerifyRequest {
 const handler = async (req: Request): Promise<Response> => {
     console.log("=== Order tracking verification function called ===");
 
+    // Handle CORS preflight
     if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
+        return new Response(null, {
+            status: 200,
+            headers: corsHeaders,
+        });
     }
 
     try {
@@ -25,6 +30,14 @@ const handler = async (req: Request): Promise<Response> => {
         if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
             throw new Error("Missing environment variables");
         }
+
+        // Initialize Supabase Client with Service Role (bypasses RLS)
+        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+            },
+        });
 
         // Parse request body
         let requestBody: VerifyRequest;
@@ -65,13 +78,10 @@ const handler = async (req: Request): Promise<Response> => {
             );
         }
 
-        // Initialize Supabase Client with Service Role
-        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
         // Find order matching email and order ID
         console.log(`Looking for order: ${orderId} with email: ${email}`);
 
-        const { data: order, error: findError } = await supabase.from("orders").select("id, customer_email, tracking_token").eq("id", orderId).eq("customer_email", email.toLowerCase().trim()).single();
+        const { data: order, error: findError } = await supabaseAdmin.from("orders").select("id, customer_email, tracking_token").eq("id", orderId).eq("customer_email", email.toLowerCase().trim()).single();
 
         if (findError || !order) {
             console.error("Order not found:", findError);
@@ -94,7 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
         console.log(`Generating access token for order: ${orderId}`);
 
         // Update order with access token
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseAdmin
             .from("orders")
             .update({
                 tracking_access_token: accessToken,
@@ -108,10 +118,6 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         console.log("Access token generated successfully");
-
-        // In production, you would send an email with a magic link
-        // For now, we'll return the access token directly
-        // TODO: Integrate email service (Resend, SendGrid, etc.)
 
         return new Response(
             JSON.stringify({
