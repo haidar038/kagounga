@@ -3,7 +3,7 @@ import { ArrowRight, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
-const HERO_BG_URL = "https://kagounga.id/wp-content/uploads/2024/07/homepage.webp";
+const HERO_BG_URL = "https://i.ibb.co.com/fV8WBdBZ/Gemini-Generated-Image-6ome4d6ome4d6ome.webp";
 
 export function HeroNew() {
     const { t } = useTranslation();

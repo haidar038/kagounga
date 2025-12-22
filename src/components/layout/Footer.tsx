@@ -13,7 +13,7 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <img src="/logo/logo_yellow.svg" alt="Kagounga Logo" className="h-8 w-8" />
+                            <img src="/logo/logo_yellow.svg" alt="Kagounga Logo" className="h-8 w-8" loading="lazy" />
                             <span className="font-heading text-xl font-semibold">Kagōunga</span>
                         </div>
                         <div className="space-y-1">
@@ -21,20 +21,20 @@ export function Footer() {
                             <p className="text-sm text-muted">{t("footer.description")}</p>
                         </div>
                         <div className="flex gap-3">
-                            <a target="_blank" href="https://www.instagram.com/kagounga.id/" className="rounded-lg bg-secondary p-2 text-muted transition-colors hover:text-foreground">
-                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/instagram/535353" />
+                            <a target="_blank" href="https://www.instagram.com/kagounga.id/" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="Instagram">
+                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/instagram/535353" alt="Instagram" loading="lazy" />
                             </a>
-                            <a target="_blank" href="https://www.facebook.com/profile.php?id=61563199222858&mibextid=ZbWKwL" className="rounded-lg bg-secondary p-2 text-muted transition-colors hover:text-foreground">
-                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/facebook/535353" />
+                            <a target="_blank" href="https://www.facebook.com/profile.php?id=61563199222858&mibextid=ZbWKwL" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="Facebook">
+                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/facebook/535353" alt="Facebook" loading="lazy" />
                             </a>
-                            <a target="_blank" href="https://x.com/kagounga" className="rounded-lg bg-secondary p-2 text-muted transition-colors hover:text-foreground">
-                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/x/535353" />
+                            <a target="_blank" href="https://x.com/kagounga" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="X (Twitter)">
+                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/x/535353" alt="X" loading="lazy" />
                             </a>
-                            <a target="_blank" href="https://threads.net/@kagounga.id" className="rounded-lg bg-secondary p-2 text-muted transition-colors hover:text-foreground">
-                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/threads/535353" />
+                            <a target="_blank" href="https://threads.net/@kagounga.id" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="Threads">
+                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/threads/535353" alt="Threads" loading="lazy" />
                             </a>
-                            <a target="_blank" href="https://www.youtube.com/@Kagounga" className="rounded-lg bg-secondary p-2 text-muted transition-colors hover:text-foreground">
-                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/youtube/535353" />
+                            <a target="_blank" href="https://www.youtube.com/@Kagounga" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="YouTube">
+                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/youtube/535353" alt="YouTube" loading="lazy" />
                             </a>
                         </div>
                     </div>

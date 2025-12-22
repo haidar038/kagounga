@@ -138,7 +138,7 @@ const About = () => {
                     <div className="grid gap-8 md:grid-cols-3">
                         <div className="flex flex-col items-center text-center rounded-3xl bg-white backdrop-blur-md p-8 shadow-lg">
                             <div className="mb-6 flex h-32 w-32 items-center justify-center p-2">
-                                <img src="https://kagounga.id/wp-content/uploads/2024/08/fish.png" alt="Harvesting" className="h-full w-full object-contain drop-shadow-md" />
+                                <img src="https://kagounga.id/wp-content/uploads/2024/08/fish.png" alt="Harvesting" className="h-full w-full object-contain drop-shadow-md" loading="lazy" />
                             </div>
                             <h3 className="font-heading text-xl font-bold mb-3 text-slate-900">{t("about.harvestingTitle")}</h3>
                             <p className="text-slate-600 leading-relaxed text-sm">{t("about.harvestingDesc")}</p>
@@ -146,7 +146,7 @@ const About = () => {
 
                         <div className="flex flex-col items-center text-center rounded-3xl bg-white backdrop-blur-md p-8 shadow-lg">
                             <div className="mb-6 flex h-32 w-32 items-center justify-center p-2">
-                                <img src="https://kagounga.id/wp-content/uploads/2024/08/hand.png" alt="Artisan Crafting" className="h-full w-full object-contain drop-shadow-md" />
+                                <img src="https://kagounga.id/wp-content/uploads/2024/08/hand.png" alt="Artisan Crafting" className="h-full w-full object-contain drop-shadow-md" loading="lazy" />
                             </div>
                             <h3 className="font-heading text-xl font-bold mb-3 text-slate-900">{t("about.artisanTitle")}</h3>
                             <p className="text-slate-600 leading-relaxed text-sm">{t("about.artisanDesc")}</p>
@@ -154,7 +154,7 @@ const About = () => {
 
                         <div className="flex flex-col items-center text-center rounded-3xl bg-white backdrop-blur-md p-8 shadow-lg">
                             <div className="mb-6 flex h-32 w-32 items-center justify-center p-2">
-                                <img src="https://kagounga.id/wp-content/uploads/2024/08/bowl.png" alt="Quality Assurance" className="h-full w-full object-contain drop-shadow-md" />
+                                <img src="https://kagounga.id/wp-content/uploads/2024/08/bowl.png" alt="Quality Assurance" className="h-full w-full object-contain drop-shadow-md" loading="lazy" />
                             </div>
                             <h3 className="font-heading text-xl font-bold mb-3 text-slate-900">{t("about.qualityTitle")}</h3>
                             <p className="text-slate-600 leading-relaxed text-sm">{t("about.qualityDesc")}</p>
