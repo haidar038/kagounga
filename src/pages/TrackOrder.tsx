@@ -147,22 +147,15 @@ const TrackOrder = () => {
         setIsSubmitting(true);
 
         try {
-            // Call verification function
-            const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/order-tracking-verify`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-                    apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, // Required for edge function authentication
-                },
-                body: JSON.stringify({
+            // Call verification function using Supabase client
+            const { data, error } = await supabase.functions.invoke("order-tracking-verify", {
+                body: {
                     email: email,
                     orderId: orderId,
-                }),
+                },
             });
-            const data = await response.json();
 
-            // if (error) throw error;
+            if (error) throw error;
 
             if (data?.success && data?.accessToken) {
                 toast.success("Pesanan ditemukan!");
