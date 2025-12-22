@@ -1,0 +1,2 @@
+# supabase/functions/order-tracking-verify/config.toml
+verify_jwt = false
