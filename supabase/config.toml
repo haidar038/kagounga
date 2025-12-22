@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.xendit-webhook]
 verify_jwt = false
+
+[functions.order-tracking-verify]
+verify_jwt = false
+
+[functions.order-tracking-get]
+verify_jwt = false
