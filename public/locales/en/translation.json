@@ -103,7 +103,10 @@
         "sending": "Sending...",
         "requiredFieldsError": "Please fill in all required fields",
         "messageSent": "Message sent!",
-        "messageSuccessDesc": "We will get back to you soon."
+        "messageSuccessDesc": "We will get back to you soon.",
+        "findUs": "Find Us",
+        "mapDescription": "Click the pin on the map to get directions to our location via Google Maps",
+        "mapHint": "Click the marker to open Google Maps and get directions"
     },
     "products": {
         "pageLabel": "Our Collection",

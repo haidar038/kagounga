@@ -248,7 +248,10 @@ const AdminTransactions = () => {
 
     const totalRevenue =
         orders?.reduce((acc, order) => {
-            if (order.status === "PAID" || order.status === "SETTLED") {
+            // Count all paid orders, including those in processing, shipped, or delivered status
+            // Only exclude PENDING, EXPIRED, FAILED, and CANCELLED orders
+            const paidStatuses = ["PAID", "SETTLED", "PROCESSING", "SHIPPED", "DELIVERED"];
+            if (paidStatuses.includes(order.status)) {
                 return acc + order.total_amount;
             }
             return acc;
@@ -360,7 +363,7 @@ const AdminTransactions = () => {
                                             <SheetTrigger asChild>
                                                 <button
                                                     onClick={() => handleOpenSheet(order)}
-                                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 w-9"
+                                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-9 w-9"
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                     <span className="sr-only">Manage Order</span>
@@ -416,7 +419,7 @@ const AdminTransactions = () => {
                                                                     </Select>
                                                                 </div>
                                                                 {selectedOrder.invoice_url && (
-                                                                    <a href={selectedOrder.invoice_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline mt-2 inline-block">
+                                                                    <a href={selectedOrder.invoice_url} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline mt-2 inline-block">
                                                                         View Xendit Invoice →
                                                                     </a>
                                                                 )}

@@ -103,7 +103,10 @@
         "sending": "Mengirim...",
         "requiredFieldsError": "Mohon lengkapi semua field yang diperlukan",
         "messageSent": "Pesan terkirim!",
-        "messageSuccessDesc": "Kami akan segera menghubungi Anda."
+        "messageSuccessDesc": "Kami akan segera menghubungi Anda.",
+        "findUs": "Temukan Kami",
+        "mapDescription": "Klik pin pada peta untuk mendapatkan arah ke lokasi kami via Google Maps",
+        "mapHint": "Klik marker untuk membuka Google Maps dan mendapatkan petunjuk arah"
     },
     "products": {
         "pageLabel": "Koleksi Kami",

@@ -5,6 +5,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SEO } from "@/components/SEO";
+import { LocationMap } from "@/components/contact/LocationMap";
 
 const Contact = () => {
     const { t } = useTranslation();
@@ -173,6 +174,20 @@ const Contact = () => {
                             </form>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* Map Section */}
+            <section className="bg-surface py-16 sm:py-20">
+                <div className="container-page">
+                    <div className="mx-auto max-w-4xl text-center mb-12">
+                        <h2 className="font-heading text-3xl font-bold">{t("contact.findUs")}</h2>
+                        <p className="mt-4 text-muted">{t("contact.mapDescription")}</p>
+                    </div>
+
+                    <LocationMap latitude={0.7893} longitude={127.3748} locationName="Kagōunga Store" address="Jl. Pertamina, Jambula, Ternate, Maluku Utara 97719" />
+
+                    <p className="mt-4 text-center text-sm text-muted">💡 {t("contact.mapHint")}</p>
                 </div>
             </section>
         </Layout>
