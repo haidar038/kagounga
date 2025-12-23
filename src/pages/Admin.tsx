@@ -27,7 +27,7 @@ function AdminDashboard() {
                     { label: "User Roles", icon: Users, href: "/admin/users", count: "Manage" },
                     { label: "Transactions", icon: LayoutDashboard, href: "/admin/transactions", count: "View" },
                 ].map((item) => (
-                    <Link key={item.label} to={item.href} className="p-6 rounded-xl bg-card border border-border hover:border-primary-border hover:shadow-soft transition-all">
+                    <Link key={item.label} to={item.href} className="p-6 rounded-xl bg-card border border-border hover:border-accent hover:shadow-soft transition-all">
                         <item.icon className="h-8 w-8 text-accent mb-3" />
                         <h3 className="font-heading font-semibold">{item.label}</h3>
                         <p className="text-sm text-muted">{item.count}</p>
