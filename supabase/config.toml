@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.order-tracking-get]
 verify_jwt = false
+
+[functions.biteship-webhook]
+verify_jwt = false

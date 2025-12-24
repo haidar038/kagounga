@@ -75,6 +75,23 @@ serve(async (req) => {
         return new Response("ok", { headers: corsHeaders });
     }
 
+    // Handle GET requests (for webhook verification)
+    if (req.method === "GET") {
+        console.log("GET request received - webhook verification");
+        return new Response("ok", {
+            headers: { ...corsHeaders, "Content-Type": "text/plain" },
+            status: 200,
+        });
+    }
+
+    // Handle POST requests (actual webhook data)
+    if (req.method !== "POST") {
+        return new Response("Method not allowed", {
+            headers: corsHeaders,
+            status: 405,
+        });
+    }
+
     try {
         // Verify webhook signature if secret is configured
         if (BITESHIP_WEBHOOK_SECRET) {
@@ -84,7 +101,26 @@ serve(async (req) => {
             console.log("Webhook signature:", signature);
         }
 
-        const webhookData: BiteshipWebhookPayload = await req.json();
+        // Handle empty body (for verification)
+        const contentType = req.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            console.log("Non-JSON request received, returning ok");
+            return new Response("ok", {
+                headers: { ...corsHeaders, "Content-Type": "text/plain" },
+                status: 200,
+            });
+        }
+
+        const body = await req.text();
+        if (!body || body.trim() === "") {
+            console.log("Empty request body received, returning ok");
+            return new Response("ok", {
+                headers: { ...corsHeaders, "Content-Type": "text/plain" },
+                status: 200,
+            });
+        }
+
+        const webhookData: BiteshipWebhookPayload = JSON.parse(body);
 
         console.log("Received Biteship webhook:", JSON.stringify(webhookData, null, 2));
 
@@ -219,7 +255,10 @@ serve(async (req) => {
                 success: false,
                 error: error.message,
             }),
-            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+                status: 200,
+            }
         );
     }
 });
