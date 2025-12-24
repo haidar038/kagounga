@@ -117,6 +117,44 @@ const handler = async (req: Request): Promise<Response> => {
 
         console.log(`Order ${external_id} updated to ${dbStatus} successfully`);
 
+        // Auto-create shipment if order is PAID and needs shipping
+        if (dbStatus === "PAID") {
+            console.log("Payment confirmed - checking if shipment creation needed");
+
+            // Get full order details including shipping info
+            const { data: orderDetails } = await supabase.from("orders").select("*").eq("id", external_id).single();
+
+            if (orderDetails && !orderDetails.is_local_delivery && orderDetails.courier_code) {
+                // Inter-city delivery - auto-create shipment via Biteship
+                console.log(`Creating shipment for inter-city order ${external_id}`);
+
+                try {
+                    const { data: shipmentData, error: shipmentError } = await supabase.functions.invoke("shipping-create", {
+                        body: {
+                            orderId: external_id,
+                            courierCode: orderDetails.courier_code,
+                            serviceCode: orderDetails.service_code,
+                            courierName: orderDetails.courier_name,
+                            serviceName: orderDetails.service_name,
+                            isLocalDelivery: false,
+                        },
+                    });
+
+                    if (shipmentError) {
+                        console.error("Failed to auto-create shipment:", shipmentError);
+                        // Don't fail the webhook - admin can create manually
+                    } else {
+                        console.log("Shipment created successfully:", shipmentData);
+                    }
+                } catch (shipmentErr) {
+                    console.error("Error creating shipment:", shipmentErr);
+                    // Don't fail the webhook
+                }
+            } else if (orderDetails && orderDetails.is_local_delivery) {
+                console.log("Local delivery - tracking number will be added manually by admin");
+            }
+        }
+
         return new Response(JSON.stringify({ success: true }), {
             headers: { "Content-Type": "application/json", ...corsHeaders },
             status: 200,

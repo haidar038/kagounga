@@ -47,11 +47,21 @@ interface Order {
     customer_phone: string;
     status: string;
     total_amount: number;
+    shipping_cost: number;
     shipping_address: string;
     city: string;
     postal_code: string;
     invoice_url: string | null;
     tracking_number: string | null;
+    // New shipping schema
+    courier_code: string | null;
+    courier_name: string | null;
+    service_code: string | null;
+    service_name: string | null;
+    estimated_delivery_days: string | null;
+    is_local_delivery: boolean | null;
+    biteship_order_id: string | null;
+    // Legacy field (keep for backward compatibility)
     courier: string | null;
     shipped_at: string | null;
     delivered_at: string | null;
@@ -70,6 +80,17 @@ const AdminTransactions = () => {
     const [courier, setCourier] = useState("");
     const [noteText, setNoteText] = useState("");
     const queryClient = useQueryClient();
+
+    // Fetch available shipping couriers for dynamic dropdown
+    const { data: availableCouriers } = useQuery({
+        queryKey: ["shipping-couriers"],
+        queryFn: async () => {
+            const { data, error } = await supabase.from("shipping_couriers").select("code, name, is_active").eq("is_active", true).order("name");
+
+            if (error) throw error;
+            return data || [];
+        },
+    });
 
     const { data: orders, isLoading } = useQuery({
         queryKey: ["admin-orders", statusFilter],
@@ -93,7 +114,7 @@ const AdminTransactions = () => {
             const { data, error } = await query;
 
             if (error) throw error;
-            return data as Order[];
+            return data as unknown as Order[];
         },
     });
 
@@ -128,11 +149,23 @@ const AdminTransactions = () => {
     // Mutation: Update Shipping Info
     const updateShippingMutation = useMutation({
         mutationFn: async ({ orderId, trackingNumber, courier }: { orderId: string; trackingNumber: string; courier: string }) => {
+            // Map courier code to name
+            const courierNames: Record<string, string> = {
+                lion_parcel: "Lion Parcel",
+                jne: "JNE",
+                jnt: "J&T Express",
+                sicepat: "SiCepat",
+                anteraja: "AnterAja",
+                local_delivery: "Pengiriman Lokal Ternate",
+            };
+
             const { error } = await supabase
                 .from("orders")
                 .update({
                     tracking_number: trackingNumber,
-                    courier: courier,
+                    courier: courier, // Legacy field
+                    courier_code: courier,
+                    courier_name: courierNames[courier] || courier.toUpperCase(),
                     status: "SHIPPED",
                     shipped_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
@@ -177,6 +210,27 @@ const AdminTransactions = () => {
         },
     });
 
+    // Mutation: Cancel Shipment
+    const cancelShipmentMutation = useMutation({
+        mutationFn: async ({ orderId, reason }: { orderId: string; reason?: string }) => {
+            const { data, error } = await supabase.functions.invoke("shipping-cancel", {
+                body: { orderId, reason },
+            });
+
+            if (error) throw error;
+            if (!data.success) throw new Error(data.message || "Failed to cancel shipment");
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+            toast.success("Shipment cancelled successfully");
+            setIsSheetOpen(false);
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to cancel shipment");
+        },
+    });
+
     const handleStatusUpdate = (status: string) => {
         setNewStatus(status);
         setShowStatusDialog(true);
@@ -208,10 +262,21 @@ const AdminTransactions = () => {
         }
     };
 
+    const handleCancelShipment = () => {
+        if (selectedOrder) {
+            const reason = prompt("Alasan pembatalan pengiriman:");
+            if (reason !== null) {
+                // Allow empty string but cancel if clicked Cancel
+                cancelShipmentMutation.mutate({ orderId: selectedOrder.id, reason });
+            }
+        }
+    };
+
     const handleOpenSheet = (order: Order) => {
         setSelectedOrder(order);
         setTrackingNumber(order.tracking_number || "");
-        setCourier(order.courier || "");
+        // Use new courier_code if available, fallback to legacy courier field
+        setCourier(order.courier_code || order.courier || "");
         setIsSheetOpen(true);
     };
 
@@ -325,6 +390,8 @@ const AdminTransactions = () => {
                             <TableHead>Order ID</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Customer</TableHead>
+                            <TableHead>City</TableHead>
+                            <TableHead>Courier</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -348,7 +415,19 @@ const AdminTransactions = () => {
                                             <span className="text-xs text-muted-foreground">{order.customer_email}</span>
                                         </div>
                                     </TableCell>
-                                    <TableCell>{formatCurrency(order.total_amount)}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm">{order.city}</span>
+                                            {order.is_local_delivery && <span className="text-xs text-accent">📍 Lokal</span>}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{order.courier_name || order.courier || "-"}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col">
+                                            <span>{formatCurrency(order.total_amount)}</span>
+                                            <span className="text-xs text-muted-foreground">Ongkir: {formatCurrency(order.shipping_cost || 0)}</span>
+                                        </div>
+                                    </TableCell>
                                     <TableCell>
                                         <Badge variant={getStatusColor(order.status) as any}>{order.status}</Badge>
                                     </TableCell>
@@ -482,8 +561,19 @@ const AdminTransactions = () => {
                                                                                     <span className="font-medium">Tracking Number:</span> {selectedOrder.tracking_number}
                                                                                 </p>
                                                                                 <p>
-                                                                                    <span className="font-medium">Courier:</span> {selectedOrder.courier?.toUpperCase()}
+                                                                                    <span className="font-medium">Courier:</span> {selectedOrder.courier_name || selectedOrder.courier?.toUpperCase() || "-"}
                                                                                 </p>
+                                                                                {selectedOrder.service_name && (
+                                                                                    <p>
+                                                                                        <span className="font-medium">Service:</span> {selectedOrder.service_name}
+                                                                                    </p>
+                                                                                )}
+                                                                                {selectedOrder.estimated_delivery_days && (
+                                                                                    <p>
+                                                                                        <span className="font-medium">Estimated:</span> {selectedOrder.estimated_delivery_days} hari
+                                                                                    </p>
+                                                                                )}
+                                                                                {selectedOrder.is_local_delivery && <p className="text-accent font-medium">📍 Pengiriman Lokal Ternate</p>}
                                                                                 {selectedOrder.shipped_at && (
                                                                                     <p>
                                                                                         <span className="font-medium">Shipped At:</span> {format(new Date(selectedOrder.shipped_at), "dd MMM yyyy HH:mm", { locale: id })}
@@ -492,6 +582,22 @@ const AdminTransactions = () => {
                                                                             </div>
                                                                         </div>
                                                                     </div>
+                                                                    {/* Cancel Shipment Button - only show for inter-city orders with Biteship tracking */}
+                                                                    {selectedOrder.biteship_order_id && selectedOrder.status !== "CANCELLED" && selectedOrder.status !== "DELIVERED" && (
+                                                                        <Button variant="destructive" className="w-full mt-4" onClick={handleCancelShipment} disabled={cancelShipmentMutation.isPending}>
+                                                                            {cancelShipmentMutation.isPending ? (
+                                                                                <>
+                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                                    Cancelling...
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <XCircle className="mr-2 h-4 w-4" />
+                                                                                    Cancel Shipment
+                                                                                </>
+                                                                            )}
+                                                                        </Button>
+                                                                    )}
                                                                 </div>
                                                             ) : selectedOrder.status === "PROCESSING" || selectedOrder.status === "PAID" ? (
                                                                 <div className="space-y-4">
@@ -502,12 +608,21 @@ const AdminTransactions = () => {
                                                                                 <SelectValue placeholder="Select courier" />
                                                                             </SelectTrigger>
                                                                             <SelectContent>
-                                                                                <SelectItem value="jne">JNE</SelectItem>
-                                                                                <SelectItem value="jnt">J&T Express</SelectItem>
-                                                                                <SelectItem value="sicepat">SiCepat</SelectItem>
-                                                                                <SelectItem value="tiki">TIKI</SelectItem>
-                                                                                <SelectItem value="pos">POS Indonesia</SelectItem>
-                                                                                <SelectItem value="anteraja">AnterAja</SelectItem>
+                                                                                {selectedOrder.is_local_delivery ? (
+                                                                                    // For local delivery, only show local delivery option
+                                                                                    <SelectItem value="local_delivery">📍 Pengiriman Lokal Ternate</SelectItem>
+                                                                                ) : (
+                                                                                    // For inter-city delivery, show all active couriers except local_delivery
+                                                                                    <>
+                                                                                        {availableCouriers
+                                                                                            ?.filter((c) => c.code !== "local_delivery")
+                                                                                            .map((c) => (
+                                                                                                <SelectItem key={c.code} value={c.code}>
+                                                                                                    {c.name}
+                                                                                                </SelectItem>
+                                                                                            ))}
+                                                                                    </>
+                                                                                )}
                                                                             </SelectContent>
                                                                         </Select>
                                                                     </div>

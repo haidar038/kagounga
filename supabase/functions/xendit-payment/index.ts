@@ -23,6 +23,15 @@ interface PaymentRequest {
     successRedirectUrl: string;
     failureRedirectUrl: string;
     userId?: string;
+    // Shipping parameters
+    shippingCost?: number;
+    courierCode?: string;
+    courierName?: string;
+    serviceCode?: string;
+    serviceName?: string;
+    estimatedDeliveryDays?: string;
+    isLocalDelivery?: boolean;
+    totalWeight?: number;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -69,7 +78,28 @@ const handler = async (req: Request): Promise<Response> => {
             throw new Error("Invalid request body");
         }
 
-        const { amount, customerName, customerEmail, customerPhone, shippingAddress, city, postalCode, items, successRedirectUrl, failureRedirectUrl, userId } = requestBody;
+        const {
+            amount,
+            customerName,
+            customerEmail,
+            customerPhone,
+            shippingAddress,
+            city,
+            postalCode,
+            items,
+            successRedirectUrl,
+            failureRedirectUrl,
+            userId,
+            // Shipping data
+            shippingCost,
+            courierCode,
+            courierName,
+            serviceCode,
+            serviceName,
+            estimatedDeliveryDays,
+            isLocalDelivery,
+            totalWeight,
+        } = requestBody;
 
         // 3. Validate required fields
         if (!amount || !customerName || !customerEmail || !customerPhone || !items || items.length === 0) {
@@ -92,14 +122,22 @@ const handler = async (req: Request): Promise<Response> => {
                 user_id: userId || null,
                 status: "PENDING",
                 total_amount: amount,
-                shipping_cost: 0, // You can calculate this or pass from client
+                shipping_cost: shippingCost || 0,
                 customer_name: customerName,
                 customer_email: customerEmail,
                 customer_phone: customerPhone,
                 shipping_address: shippingAddress || "",
                 city: city || "",
                 postal_code: postalCode || "",
-                tracking_token: trackingToken, // Add tracking token
+                tracking_token: trackingToken,
+                // Shipping information
+                courier_code: courierCode,
+                courier_name: courierName,
+                service_code: serviceCode,
+                service_name: serviceName,
+                estimated_delivery_days: estimatedDeliveryDays,
+                is_local_delivery: isLocalDelivery || false,
+                total_weight_kg: totalWeight || 1.0,
             })
             .select()
             .single();
