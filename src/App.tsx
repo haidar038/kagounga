@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { CartProvider } from "@/contexts/CartContext";
+import { CartProvider } from "@/contexts/CartProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import TrackOrder from "./pages/TrackOrder";
+import MyOrders from "./pages/MyOrders";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,14 @@ const App = () => (
                                 <Route path="/privacy" element={<PrivacyPolicy />} />
                                 <Route path="/terms" element={<TermsAndConditions />} />
                                 <Route path="/track-order" element={<TrackOrder />} />
+                                <Route
+                                    path="/my-orders"
+                                    element={
+                                        <ProtectedRoute>
+                                            <MyOrders />
+                                        </ProtectedRoute>
+                                    }
+                                />
                                 <Route path="*" element={<NotFound />} />
                             </Routes>
                         </BrowserRouter>

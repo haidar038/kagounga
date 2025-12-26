@@ -119,39 +119,85 @@ const handler = async (req: Request): Promise<Response> => {
 
         // Auto-create shipment if order is PAID and needs shipping
         if (dbStatus === "PAID") {
-            console.log("Payment confirmed - checking if shipment creation needed");
+            console.log("=== PAYMENT CONFIRMED - CHECKING SHIPMENT CREATION ===");
 
             // Get full order details including shipping info
-            const { data: orderDetails } = await supabase.from("orders").select("*").eq("id", external_id).single();
+            const { data: orderDetails, error: orderFetchError } = await supabase.from("orders").select("*").eq("id", external_id).single();
 
-            if (orderDetails && !orderDetails.is_local_delivery && orderDetails.courier_code) {
-                // Inter-city delivery - auto-create shipment via Biteship
-                console.log(`Creating shipment for inter-city order ${external_id}`);
+            if (orderFetchError) {
+                console.error("Failed to fetch order details:", orderFetchError);
+                // Continue with webhook processing
+            } else if (!orderDetails) {
+                console.error("Order details not found for:", external_id);
+            } else {
+                // Log complete order details for debugging
+                console.log("Order Details Retrieved:", {
+                    orderId: orderDetails.id,
+                    isLocalDelivery: orderDetails.is_local_delivery,
+                    courierCode: orderDetails.courier_code,
+                    courierName: orderDetails.courier_name,
+                    serviceCode: orderDetails.service_code,
+                    serviceName: orderDetails.service_name,
+                    city: orderDetails.city,
+                    hasExistingTracking: !!orderDetails.tracking_number,
+                    hasBiteshipOrderId: !!orderDetails.biteship_order_id,
+                });
 
-                try {
-                    const { data: shipmentData, error: shipmentError } = await supabase.functions.invoke("shipping-create", {
-                        body: {
+                // Check conditions for shipment creation
+                const shouldCreateShipment = !orderDetails.is_local_delivery && orderDetails.courier_code;
+                console.log("Shipment Creation Check:", {
+                    shouldCreate: shouldCreateShipment,
+                    reason: !shouldCreateShipment ? (orderDetails.is_local_delivery ? "Local delivery - no Biteship order needed" : "Missing courier_code") : "All conditions met - proceeding",
+                });
+
+                if (shouldCreateShipment) {
+                    // Inter-city delivery - auto-create shipment via Biteship
+                    console.log(`🚀 Creating Biteship shipment for inter-city order ${external_id}`);
+
+                    try {
+                        const shipmentPayload = {
                             orderId: external_id,
                             courierCode: orderDetails.courier_code,
                             serviceCode: orderDetails.service_code,
                             courierName: orderDetails.courier_name,
                             serviceName: orderDetails.service_name,
                             isLocalDelivery: false,
-                        },
-                    });
+                        };
 
-                    if (shipmentError) {
-                        console.error("Failed to auto-create shipment:", shipmentError);
-                        // Don't fail the webhook - admin can create manually
-                    } else {
-                        console.log("Shipment created successfully:", shipmentData);
+                        console.log("Invoking shipping-create with payload:", shipmentPayload);
+
+                        const { data: shipmentData, error: shipmentError } = await supabase.functions.invoke("shipping-create", {
+                            body: shipmentPayload,
+                        });
+
+                        if (shipmentError) {
+                            console.error("❌ Failed to auto-create shipment:", {
+                                error: shipmentError,
+                                message: shipmentError.message,
+                                details: shipmentError,
+                            });
+                            // Don't fail the webhook - admin can create manually
+                        } else {
+                            console.log("✅ Shipment created successfully:", {
+                                success: shipmentData?.success,
+                                trackingNumber: shipmentData?.trackingNumber,
+                                biteshipOrderId: shipmentData?.biteshipOrderId,
+                                isLocal: shipmentData?.isLocal,
+                            });
+                        }
+                    } catch (shipmentErr: any) {
+                        console.error("❌ Exception during shipment creation:", {
+                            error: shipmentErr,
+                            message: shipmentErr?.message,
+                            stack: shipmentErr?.stack,
+                        });
+                        // Don't fail the webhook
                     }
-                } catch (shipmentErr) {
-                    console.error("Error creating shipment:", shipmentErr);
-                    // Don't fail the webhook
+                } else if (orderDetails.is_local_delivery) {
+                    console.log("📦 Local delivery - tracking number will be added manually by admin");
+                } else {
+                    console.warn("⚠️ Shipment creation skipped - missing courier information");
                 }
-            } else if (orderDetails && orderDetails.is_local_delivery) {
-                console.log("Local delivery - tracking number will be added manually by admin");
             }
         }
 

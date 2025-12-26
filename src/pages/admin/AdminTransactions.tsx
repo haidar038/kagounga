@@ -12,10 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Eye, Loader2, Package, ShoppingCart, DollarSign, Clock, Truck, CheckCircle, XCircle, MessageSquare, History } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, Loader2, Package, ShoppingCart, DollarSign, Clock, Truck, CheckCircle, XCircle, MessageSquare, History, Download, FileSpreadsheet, FileText, Printer, CheckSquare } from "lucide-react";
 import { toast } from "sonner";
+import { exportOrdersToCSV, exportOrdersToExcel } from "@/lib/exportUtils";
 
 interface OrderItem {
     id: string;
@@ -79,6 +83,9 @@ const AdminTransactions = () => {
     const [trackingNumber, setTrackingNumber] = useState("");
     const [courier, setCourier] = useState("");
     const [noteText, setNoteText] = useState("");
+    const [isLocalDelivery, setIsLocalDelivery] = useState(false);
+    const [shippingNotes, setShippingNotes] = useState("");
+    const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
     const queryClient = useQueryClient();
 
     // Fetch available shipping couriers for dynamic dropdown
@@ -148,7 +155,7 @@ const AdminTransactions = () => {
 
     // Mutation: Update Shipping Info
     const updateShippingMutation = useMutation({
-        mutationFn: async ({ orderId, trackingNumber, courier }: { orderId: string; trackingNumber: string; courier: string }) => {
+        mutationFn: async ({ orderId, trackingNumber, courier, isLocal, notes }: { orderId: string; trackingNumber: string; courier: string; isLocal?: boolean; notes?: string }) => {
             // Map courier code to name
             const courierNames: Record<string, string> = {
                 lion_parcel: "Lion Parcel",
@@ -159,18 +166,25 @@ const AdminTransactions = () => {
                 local_delivery: "Pengiriman Lokal Ternate",
             };
 
-            const { error } = await supabase
-                .from("orders")
-                .update({
-                    tracking_number: trackingNumber,
-                    courier: courier, // Legacy field
-                    courier_code: courier,
-                    courier_name: courierNames[courier] || courier.toUpperCase(),
-                    status: "SHIPPED",
-                    shipped_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                })
-                .eq("id", orderId);
+            const updateData: any = {
+                tracking_number: trackingNumber,
+                courier: courier, // Legacy field
+                courier_code: courier,
+                courier_name: courierNames[courier] || courier.toUpperCase(),
+                status: "SHIPPED",
+                shipped_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            };
+
+            // Add local delivery specific fields
+            if (isLocal !== undefined) {
+                updateData.is_local_delivery = isLocal;
+            }
+            if (notes) {
+                updateData.shipping_notes = notes;
+            }
+
+            const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
 
             if (error) throw error;
             return { success: true };
@@ -180,6 +194,8 @@ const AdminTransactions = () => {
             toast.success("Shipping information updated");
             setTrackingNumber("");
             setCourier("");
+            setIsLocalDelivery(false);
+            setShippingNotes("");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update shipping info");
@@ -231,6 +247,33 @@ const AdminTransactions = () => {
         },
     });
 
+    // Mutation: Bulk Update Order Status
+    const bulkUpdateStatusMutation = useMutation({
+        mutationFn: async ({ orderIds, status }: { orderIds: string[]; status: string }) => {
+            const updateData: any = { status, updated_at: new Date().toISOString() };
+
+            if (status === "SHIPPED") {
+                updateData.shipped_at = new Date().toISOString();
+            }
+            if (status === "DELIVERED") {
+                updateData.delivered_at = new Date().toISOString();
+            }
+
+            const { error } = await supabase.from("orders").update(updateData).in("id", orderIds);
+
+            if (error) throw error;
+            return { count: orderIds.length };
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+            toast.success(`${data.count} orders updated successfully`);
+            setSelectedOrders([]);
+        },
+        onError: (error: any) => {
+            toast.error(error.message || "Failed to update orders");
+        },
+    });
+
     const handleStatusUpdate = (status: string) => {
         setNewStatus(status);
         setShowStatusDialog(true);
@@ -248,6 +291,8 @@ const AdminTransactions = () => {
                 orderId: selectedOrder.id,
                 trackingNumber,
                 courier,
+                isLocal: isLocalDelivery,
+                notes: shippingNotes,
             });
         } else {
             toast.error("Please fill in tracking number and courier");
@@ -277,7 +322,121 @@ const AdminTransactions = () => {
         setTrackingNumber(order.tracking_number || "");
         // Use new courier_code if available, fallback to legacy courier field
         setCourier(order.courier_code || order.courier || "");
+        setIsLocalDelivery(order.is_local_delivery || false);
+        setShippingNotes("");
         setIsSheetOpen(true);
+    };
+
+    const handleSelectOrder = (orderId: string, checked: boolean) => {
+        if (checked) {
+            setSelectedOrders((prev) => [...prev, orderId]);
+        } else {
+            setSelectedOrders((prev) => prev.filter((id) => id !== orderId));
+        }
+    };
+
+    const handleSelectAll = (checked: boolean) => {
+        if (checked && orders) {
+            setSelectedOrders(orders.map((o) => o.id));
+        } else {
+            setSelectedOrders([]);
+        }
+    };
+
+    const handleBulkStatusUpdate = (status: string) => {
+        if (selectedOrders.length === 0) {
+            toast.error("Please select at least one order");
+            return;
+        }
+        bulkUpdateStatusMutation.mutate({ orderIds: selectedOrders, status });
+    };
+
+    const printShippingLabel = (order: Order) => {
+        const labelWindow = window.open("", "_blank", "width=400,height=600");
+        if (!labelWindow) {
+            toast.error("Please allow popups for this site");
+            return;
+        }
+
+        const itemsList = order.items?.map((item) => `${item.product_name} x${item.quantity}`).join(", ") || "N/A";
+
+        labelWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Shipping Label - ${order.id.slice(0, 8)}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; max-width: 350px; margin: 0 auto; }
+                    .label { border: 2px solid #000; padding: 15px; }
+                    .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+                    .header h2 { margin: 0; font-size: 18px; }
+                    .section { margin: 10px 0; }
+                    .section-title { font-weight: bold; font-size: 12px; color: #666; margin-bottom: 5px; }
+                    .content { font-size: 14px; }
+                    .to-section { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+                    .barcode { text-align: center; padding: 15px 0; border-top: 1px dashed #000; margin-top: 10px; }
+                    .tracking { font-family: monospace; font-size: 16px; font-weight: bold; }
+                    .items { font-size: 12px; color: #666; }
+                    @media print { body { padding: 0; } }
+                </style>
+            </head>
+            <body>
+                <div class="label">
+                    <div class="header">
+                        <h2>KAGOUNGA</h2>
+                        <p style="margin: 5px 0; font-size: 12px;">Shipping Label</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">FROM:</div>
+                        <div class="content">
+                            Kagounga Store<br/>
+                            Ternate, Maluku Utara<br/>
+                            Indonesia
+                        </div>
+                    </div>
+                    
+                    <div class="to-section">
+                        <div class="section-title">TO:</div>
+                        <div class="content">
+                            <strong>${order.customer_name}</strong><br/>
+                            ${order.shipping_address}<br/>
+                            ${order.city}, ${order.postal_code}<br/>
+                            📞 ${order.customer_phone}
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">COURIER:</div>
+                        <div class="content">${order.courier_name || order.courier || "N/A"}</div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title">ITEMS:</div>
+                        <div class="items">${itemsList}</div>
+                    </div>
+                    
+                    <div class="barcode">
+                        <div class="section-title">TRACKING NUMBER:</div>
+                        <div class="tracking">${order.tracking_number || "PENDING"}</div>
+                    </div>
+                </div>
+                <script>window.print();</script>
+            </body>
+            </html>
+        `);
+        labelWindow.document.close();
+    };
+
+    const printSelectedLabels = () => {
+        if (selectedOrders.length === 0) {
+            toast.error("Please select at least one order");
+            return;
+        }
+        const selectedOrderData = orders?.filter((o) => selectedOrders.includes(o.id)) || [];
+        selectedOrderData.forEach((order, index) => {
+            setTimeout(() => printShippingLabel(order), index * 500);
+        });
     };
 
     const formatCurrency = (amount: number) => {
@@ -291,8 +450,11 @@ const AdminTransactions = () => {
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
             case "paid":
+                return "default";
+            case "delivered":
+                return "accent";
             case "settled":
-                return "default"; // green/primary usually
+                return "success";
             case "pending":
                 return "secondary";
             case "expired":
@@ -300,6 +462,52 @@ const AdminTransactions = () => {
                 return "destructive";
             default:
                 return "outline";
+        }
+    };
+
+    // Generate realistic tracking numbers for testing/simulation
+    const generateTrackingNumber = async (courierCode: string): Promise<string> => {
+        const date = new Date();
+        const dateStr = format(date, "yyyyMMdd");
+
+        // For local delivery, use sequential numbering
+        if (courierCode === "local_delivery") {
+            const { data } = await supabase.from("orders").select("tracking_number").like("tracking_number", `TERN-${dateStr}-%`).order("tracking_number", { ascending: false }).limit(1);
+
+            const lastTrackingNumber = data?.[0]?.tracking_number;
+            const counter = lastTrackingNumber ? parseInt(lastTrackingNumber.split("-")[2]) + 1 : 1;
+
+            return `TERN-${dateStr}-${counter.toString().padStart(3, "0")}`;
+        }
+
+        // For other couriers, use random numbers
+        switch (courierCode) {
+            case "jne":
+                return `JT${Math.floor(Math.random() * 100000000000)
+                    .toString()
+                    .padStart(11, "0")}`;
+            case "jnt":
+                return `JT${Math.floor(Math.random() * 1000000000000)
+                    .toString()
+                    .padStart(12, "0")}`;
+            case "lion_parcel":
+                return `LION${Math.floor(Math.random() * 10000000000)
+                    .toString()
+                    .padStart(10, "0")}`;
+            case "sicepat":
+                return `000${Math.floor(Math.random() * 1000000000000)
+                    .toString()
+                    .padStart(12, "0")}`;
+            case "anteraja":
+                return `AJ${Math.floor(Math.random() * 1000000000000)
+                    .toString()
+                    .padStart(12, "0")}`;
+            default: {
+                const random = Math.floor(Math.random() * 100000)
+                    .toString()
+                    .padStart(5, "0");
+                return `TRACK-${dateStr}-${random}`;
+            }
         }
     };
 
@@ -367,7 +575,7 @@ const AdminTransactions = () => {
             </div>
 
             {/* Controls */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter Status" />
@@ -380,13 +588,95 @@ const AdminTransactions = () => {
                         <SelectItem value="EXPIRED">Expired</SelectItem>
                     </SelectContent>
                 </Select>
+
+                {/* Export Dropdown */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline">
+                            <Download className="h-4 w-4 mr-2" />
+                            Export
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                            onClick={async () => {
+                                if (orders && orders.length > 0) {
+                                    try {
+                                        await exportOrdersToCSV(orders as any);
+                                        toast.success("Orders exported to CSV successfully");
+                                    } catch (error) {
+                                        toast.error("Failed to export to CSV");
+                                    }
+                                } else {
+                                    toast.error("No orders to export");
+                                }
+                            }}
+                        >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Export to CSV
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={async () => {
+                                if (orders && orders.length > 0) {
+                                    try {
+                                        await exportOrdersToExcel(orders as any);
+                                        toast.success("Orders exported to Excel successfully");
+                                    } catch (error) {
+                                        toast.error("Failed to export to Excel");
+                                    }
+                                } else {
+                                    toast.error("No orders to export");
+                                }
+                            }}
+                        >
+                            <FileSpreadsheet className="h-4 w-4 mr-2" />
+                            Export to Excel
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
+
+            {/* Bulk Actions */}
+            {selectedOrders.length > 0 && (
+                <div className="flex items-center gap-2 p-3 bg-muted/10 rounded-lg">
+                    <CheckSquare className="h-4 w-4" />
+                    <span className="text-sm font-medium">{selectedOrders.length} order(s) selected</span>
+                    <div className="flex-1" />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button size="sm" disabled={bulkUpdateStatusMutation.isPending}>
+                                {bulkUpdateStatusMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Package className="h-4 w-4 mr-2" />}
+                                Update Status
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => handleBulkStatusUpdate("PROCESSING")}>Mark as Processing</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleBulkStatusUpdate("SHIPPED")}>Mark as Shipped</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleBulkStatusUpdate("DELIVERED")}>Mark as Delivered</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleBulkStatusUpdate("CANCELLED")} className="text-destructive">
+                                Cancel Orders
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button size="sm" variant="outline" className="bg-white text-slate-800" onClick={printSelectedLabels}>
+                        <Printer className="h-4 w-4 mr-2" />
+                        Print Labels
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setSelectedOrders([])}>
+                        Clear
+                    </Button>
+                </div>
+            )}
 
             {/* Table */}
             <div className="rounded-md border bg-card">
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead className="w-12">
+                                <Checkbox checked={orders && orders.length > 0 && selectedOrders.length === orders.length} onCheckedChange={handleSelectAll} />
+                            </TableHead>
                             <TableHead>Order ID</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Customer</TableHead>
@@ -400,13 +690,16 @@ const AdminTransactions = () => {
                     <TableBody>
                         {orders?.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                                     No orders found.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             orders?.map((order) => (
                                 <TableRow key={order.id}>
+                                    <TableCell>
+                                        <Checkbox checked={selectedOrders.includes(order.id)} onCheckedChange={(checked) => handleSelectOrder(order.id, !!checked)} />
+                                    </TableCell>
                                     <TableCell className="font-mono text-xs text-muted-foreground">{order.id.slice(0, 8)}...</TableCell>
                                     <TableCell>{order.created_at ? format(new Date(order.created_at), "dd MMM yyyy HH:mm", { locale: id }) : "-"}</TableCell>
                                     <TableCell>
@@ -628,8 +921,60 @@ const AdminTransactions = () => {
                                                                     </div>
                                                                     <div>
                                                                         <Label htmlFor="tracking">Tracking Number / Resi</Label>
-                                                                        <Input id="tracking" value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} placeholder="Enter tracking number" />
+                                                                        <div className="flex gap-2">
+                                                                            <Input id="tracking" value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} placeholder="Enter tracking number" className="flex-1" />
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="outline"
+                                                                                onClick={async () => {
+                                                                                    if (courier) {
+                                                                                        const generated = await generateTrackingNumber(courier);
+                                                                                        setTrackingNumber(generated);
+                                                                                        toast.success("Tracking number generated");
+                                                                                    } else {
+                                                                                        toast.error("Please select a courier first");
+                                                                                    }
+                                                                                }}
+                                                                                disabled={!courier}
+                                                                            >
+                                                                                Generate
+                                                                            </Button>
+                                                                        </div>
+                                                                        <p className="text-xs text-muted-foreground mt-1">Click Generate for sample tracking number, or enter manually</p>
                                                                     </div>
+
+                                                                    {/* Local Delivery Toggle */}
+                                                                    <div className="flex items-center space-x-2 py-2 rounded-lg border p-3 bg-muted/30">
+                                                                        <Switch
+                                                                            id="local-delivery-toggle"
+                                                                            checked={isLocalDelivery}
+                                                                            onCheckedChange={(checked) => {
+                                                                                setIsLocalDelivery(checked);
+                                                                                if (checked) {
+                                                                                    setCourier("local_delivery");
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                        <Label htmlFor="local-delivery-toggle" className="cursor-pointer font-medium">
+                                                                            📍 Pengiriman Lokal Ternate
+                                                                        </Label>
+                                                                    </div>
+
+                                                                    {/* Shipping Notes for Local Delivery */}
+                                                                    {isLocalDelivery && (
+                                                                        <div>
+                                                                            <Label htmlFor="shipping-notes">Delivery Notes (Optional)</Label>
+                                                                            <Textarea
+                                                                                id="shipping-notes"
+                                                                                value={shippingNotes}
+                                                                                onChange={(e) => setShippingNotes(e.target.value)}
+                                                                                placeholder="e.g., Delivery address details, contact person, special instructions..."
+                                                                                rows={3}
+                                                                            />
+                                                                            <p className="text-xs text-muted-foreground mt-1">Additional notes for local delivery courier</p>
+                                                                        </div>
+                                                                    )}
+
                                                                     <Button onClick={handleShipOrder} disabled={updateShippingMutation.isPending} className="w-full">
                                                                         {updateShippingMutation.isPending ? (
                                                                             <>

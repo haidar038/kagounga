@@ -108,7 +108,7 @@ const About = () => {
                     <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
                         {teamMembers.map((member, idx) => (
                             <div key={idx} className="group flex flex-col items-center text-center transition-all">
-                                <div className="aspect-square w-full max-w-[200px] overflow-hidden rounded-full bg-muted mb-4">
+                                <div className="aspect-square w-full max-w-[200px] overflow-hidden rounded-full bg-muted/10mb-4">
                                     <img src={member.image} alt={member.name} className="h-full w-full object-cover filter grayscale transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                                 </div>
                                 <div className="flex flex-col">

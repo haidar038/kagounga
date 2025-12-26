@@ -26,9 +26,8 @@ dist-ssr
 
 .env
 
+
 dbsecret.txt
 
 supabase/.temp
 database
-
-.agent

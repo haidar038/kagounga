@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, CreditCard, Truck, Check, Loader2, Building, Wallet, ExternalLink, Package } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ type Step = "shipping" | "shipping-method" | "payment" | "processing";
 const Checkout = () => {
     const navigate = useNavigate();
     const { items, totalPrice, clearCart } = useCart();
+    const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState<Step>("shipping");
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -27,6 +29,13 @@ const Checkout = () => {
         city: "",
         postalCode: "",
     });
+
+    // Auto-fill email for authenticated users
+    useEffect(() => {
+        if (user?.email && !shippingInfo.email) {
+            setShippingInfo((prev) => ({ ...prev, email: user.email || "" }));
+        }
+    }, [user]);
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("id-ID", {

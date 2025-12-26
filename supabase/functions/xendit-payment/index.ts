@@ -153,6 +153,21 @@ const handler = async (req: Request): Promise<Response> => {
 
         console.log("Order created successfully:", orderData.id);
 
+        // Log shipping data for debugging
+        console.log("Shipping Data Saved:", {
+            courierCode: orderData.courier_code,
+            courierName: orderData.courier_name,
+            serviceCode: orderData.service_code,
+            serviceName: orderData.service_name,
+            isLocalDelivery: orderData.is_local_delivery,
+            estimatedDeliveryDays: orderData.estimated_delivery_days,
+        });
+
+        // Warn if critical shipping data is missing
+        if (!isLocalDelivery && !courierCode) {
+            console.warn("⚠️ WARNING: Inter-city order created without courier information!");
+        }
+
         // 6. Create Order Items
         console.log("Creating order items...");
         const orderItems = items.map((item) => ({

@@ -88,7 +88,7 @@ export default function PrivacyPolicy() {
                                     <ul className="mt-4 space-y-3">
                                         {section2Items.map((item: string, i: number) => (
                                             <li key={i} className="flex items-start gap-3 text-muted-foreground">
-                                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-muted" />
+                                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-muted/10" />
                                                 <span>{item}</span>
                                             </li>
                                         ))}

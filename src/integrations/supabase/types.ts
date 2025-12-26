@@ -39,6 +39,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_logs: {
+        Row: {
+          action_type: string
+          admin_email: string
+          admin_id: string
+          changes: Json | null
+          created_at: string
+          entity_id: string
+          entity_name: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_email: string
+          admin_id: string
+          changes?: Json | null
+          created_at?: string
+          entity_id: string
+          entity_name?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_email?: string
+          admin_id?: string
+          changes?: Json | null
+          created_at?: string
+          entity_id?: string
+          entity_name?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      admin_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       cta_content: {
         Row: {
           button_text: string | null
@@ -209,6 +269,8 @@ export type Database = {
           product_id: string
           product_name: string
           quantity: number
+          variant_id: string | null
+          variant_name: string | null
         }
         Insert: {
           created_at?: string | null
@@ -218,6 +280,8 @@ export type Database = {
           product_id: string
           product_name: string
           quantity: number
+          variant_id?: string | null
+          variant_name?: string | null
         }
         Update: {
           created_at?: string | null
@@ -227,6 +291,8 @@ export type Database = {
           product_id?: string
           product_name?: string
           quantity?: number
+          variant_id?: string | null
+          variant_name?: string | null
         }
         Relationships: [
           {
@@ -234,6 +300,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -275,23 +348,33 @@ export type Database = {
       }
       orders: {
         Row: {
+          biteship_order_id: string | null
           city: string
           courier: string | null
+          courier_code: string | null
+          courier_name: string | null
           created_at: string | null
           customer_email: string
           customer_name: string
           customer_phone: string
           delivered_at: string | null
           estimated_delivery: string | null
+          estimated_delivery_days: string | null
           external_id: string | null
           id: string
           invoice_url: string | null
+          is_local_delivery: boolean | null
+          payment_method: string | null
           postal_code: string
+          service_code: string | null
+          service_name: string | null
           shipped_at: string | null
           shipping_address: string
           shipping_cost: number
+          shipping_notes: string | null
           status: string
           total_amount: number
+          total_weight_kg: number | null
           tracking_access_expires_at: string | null
           tracking_access_token: string | null
           tracking_number: string | null
@@ -300,23 +383,33 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          biteship_order_id?: string | null
           city: string
           courier?: string | null
+          courier_code?: string | null
+          courier_name?: string | null
           created_at?: string | null
           customer_email: string
           customer_name: string
           customer_phone: string
           delivered_at?: string | null
           estimated_delivery?: string | null
+          estimated_delivery_days?: string | null
           external_id?: string | null
           id?: string
           invoice_url?: string | null
+          is_local_delivery?: boolean | null
+          payment_method?: string | null
           postal_code: string
+          service_code?: string | null
+          service_name?: string | null
           shipped_at?: string | null
           shipping_address: string
           shipping_cost?: number
+          shipping_notes?: string | null
           status?: string
           total_amount: number
+          total_weight_kg?: number | null
           tracking_access_expires_at?: string | null
           tracking_access_token?: string | null
           tracking_number?: string | null
@@ -325,23 +418,33 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          biteship_order_id?: string | null
           city?: string
           courier?: string | null
+          courier_code?: string | null
+          courier_name?: string | null
           created_at?: string | null
           customer_email?: string
           customer_name?: string
           customer_phone?: string
           delivered_at?: string | null
           estimated_delivery?: string | null
+          estimated_delivery_days?: string | null
           external_id?: string | null
           id?: string
           invoice_url?: string | null
+          is_local_delivery?: boolean | null
+          payment_method?: string | null
           postal_code?: string
+          service_code?: string | null
+          service_name?: string | null
           shipped_at?: string | null
           shipping_address?: string
           shipping_cost?: number
+          shipping_notes?: string | null
           status?: string
           total_amount?: number
+          total_weight_kg?: number | null
           tracking_access_expires_at?: string | null
           tracking_access_token?: string | null
           tracking_number?: string | null
@@ -378,15 +481,133 @@ export type Database = {
         }
         Relationships: []
       }
+      product_reviews: {
+        Row: {
+          created_at: string
+          guest_email: string | null
+          guest_name: string | null
+          helpful_count: number
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_note: string | null
+          product_id: string
+          rating: number
+          review_text: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          helpful_count?: number
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_note?: string | null
+          product_id: string
+          rating: number
+          review_text: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          helpful_count?: number
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_note?: string | null
+          product_id?: string
+          rating?: number
+          review_text?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          attributes: Json
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          original_price: number | null
+          price: number
+          product_id: string
+          sku: string
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          attributes?: Json
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          original_price?: number | null
+          price: number
+          product_id: string
+          sku: string
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          attributes?: Json
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          original_price?: number | null
+          price?: number
+          product_id?: string
+          sku?: string
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           category_id: string
           created_at: string
           description: string
+          has_variants: boolean
+          height_cm: number | null
           id: string
           image: string
           images: string[] | null
           is_active: boolean
+          length_cm: number | null
           long_description: string | null
           name: string
           nutrition_calories: number | null
@@ -403,15 +624,20 @@ export type Database = {
           stock: number
           tags: string[] | null
           updated_at: string
+          weight_kg: number
+          width_cm: number | null
         }
         Insert: {
           category_id: string
           created_at?: string
           description: string
+          has_variants?: boolean
+          height_cm?: number | null
           id?: string
           image: string
           images?: string[] | null
           is_active?: boolean
+          length_cm?: number | null
           long_description?: string | null
           name: string
           nutrition_calories?: number | null
@@ -428,15 +654,20 @@ export type Database = {
           stock?: number
           tags?: string[] | null
           updated_at?: string
+          weight_kg?: number
+          width_cm?: number | null
         }
         Update: {
           category_id?: string
           created_at?: string
           description?: string
+          has_variants?: boolean
+          height_cm?: number | null
           id?: string
           image?: string
           images?: string[] | null
           is_active?: boolean
+          length_cm?: number | null
           long_description?: string | null
           name?: string
           nutrition_calories?: number | null
@@ -453,6 +684,8 @@ export type Database = {
           stock?: number
           tags?: string[] | null
           updated_at?: string
+          weight_kg?: number
+          width_cm?: number | null
         }
         Relationships: [
           {
@@ -460,6 +693,234 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      refund_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          order_id: string
+          payment_request_id: string | null
+          reason: string
+          reason_note: string | null
+          refund_method: string | null
+          requested_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          xendit_refund_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          order_id: string
+          payment_request_id?: string | null
+          reason: string
+          reason_note?: string | null
+          refund_method?: string | null
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          xendit_refund_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          payment_request_id?: string | null
+          reason?: string
+          reason_note?: string | null
+          refund_method?: string | null
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          xendit_refund_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_helpful_votes: {
+        Row: {
+          created_at: string
+          guest_identifier: string | null
+          id: string
+          review_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          guest_identifier?: string | null
+          id?: string
+          review_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          guest_identifier?: string | null
+          id?: string
+          review_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_helpful_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "product_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_couriers: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          priority: number
+          supports_intercity: boolean
+          supports_local: boolean
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          priority?: number
+          supports_intercity?: boolean
+          supports_local?: boolean
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          priority?: number
+          supports_intercity?: boolean
+          supports_local?: boolean
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      shipping_rates_cache: {
+        Row: {
+          cached_at: string | null
+          courier_code: string
+          destination_area_id: string | null
+          destination_city: string
+          expires_at: string
+          id: string
+          max_estimated_days: number | null
+          min_estimated_days: number | null
+          origin_city: string
+          rate_amount: number
+          service_code: string
+          service_name: string
+          weight_kg: number
+        }
+        Insert: {
+          cached_at?: string | null
+          courier_code: string
+          destination_area_id?: string | null
+          destination_city: string
+          expires_at: string
+          id?: string
+          max_estimated_days?: number | null
+          min_estimated_days?: number | null
+          origin_city: string
+          rate_amount: number
+          service_code: string
+          service_name: string
+          weight_kg: number
+        }
+        Update: {
+          cached_at?: string | null
+          courier_code?: string
+          destination_area_id?: string | null
+          destination_city?: string
+          expires_at?: string
+          id?: string
+          max_estimated_days?: number | null
+          min_estimated_days?: number | null
+          origin_city?: string
+          rate_amount?: number
+          service_code?: string
+          service_name?: string
+          weight_kg?: number
+        }
+        Relationships: []
+      }
+      shipping_services: {
+        Row: {
+          courier_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          max_estimated_days: number | null
+          min_estimated_days: number | null
+          service_code: string
+          service_name: string
+        }
+        Insert: {
+          courier_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_estimated_days?: number | null
+          min_estimated_days?: number | null
+          service_code: string
+          service_name: string
+        }
+        Update: {
+          courier_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_estimated_days?: number | null
+          min_estimated_days?: number | null
+          service_code?: string
+          service_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipping_services_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_couriers"
             referencedColumns: ["id"]
           },
         ]
@@ -517,7 +978,64 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      daily_payment_stats: {
+        Row: {
+          daily_revenue: number | null
+          failed_transactions: number | null
+          success_rate: number | null
+          successful_transactions: number | null
+          total_transactions: number | null
+          transaction_date: string | null
+        }
+        Relationships: []
+      }
+      monthly_payment_stats: {
+        Row: {
+          failed_transactions: number | null
+          month_start: string | null
+          monthly_revenue: number | null
+          success_rate: number | null
+          successful_transactions: number | null
+          total_transactions: number | null
+        }
+        Relationships: []
+      }
+      payment_statistics: {
+        Row: {
+          average_transaction_value: number | null
+          failed_transactions: number | null
+          failure_rate: number | null
+          first_transaction_date: string | null
+          last_transaction_date: string | null
+          success_rate: number | null
+          successful_transactions: number | null
+          total_revenue: number | null
+          total_transactions: number | null
+        }
+        Relationships: []
+      }
+      revenue_by_payment_method: {
+        Row: {
+          average_value: number | null
+          payment_method: string | null
+          success_rate: number | null
+          successful_count: number | null
+          total_revenue: number | null
+          transaction_count: number | null
+        }
+        Relationships: []
+      }
+      weekly_payment_stats: {
+        Row: {
+          failed_transactions: number | null
+          success_rate: number | null
+          successful_transactions: number | null
+          total_transactions: number | null
+          week_start: string | null
+          weekly_revenue: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_order_for_tracking: {
@@ -537,6 +1055,41 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_payment_stats: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          average_transaction_value: number
+          failed_transactions: number
+          failure_rate: number
+          success_rate: number
+          successful_transactions: number
+          total_revenue: number
+          total_transactions: number
+        }[]
+      }
+      get_product_with_variants: {
+        Args: { p_product_id: string }
+        Returns: {
+          product_data: Json
+          variants_data: Json
+        }[]
+      }
+      get_refund_with_order: {
+        Args: { p_refund_id: string }
+        Returns: {
+          order_data: Json
+          refund_data: Json
+        }[]
+      }
+      get_top_payment_methods: {
+        Args: { limit_count?: number }
+        Returns: {
+          payment_method: string
+          success_rate: number
+          total_revenue: number
+          transaction_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -544,6 +1097,22 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_order_refundable: { Args: { p_order_id: string }; Returns: boolean }
+      log_admin_activity: {
+        Args: {
+          p_action_type: string
+          p_admin_email: string
+          p_admin_id: string
+          p_changes?: Json
+          p_entity_id: string
+          p_entity_name?: string
+          p_entity_type: string
+          p_ip_address?: string
+          p_user_agent?: string
+        }
+        Returns: string
+      }
+      product_has_variants: { Args: { p_product_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

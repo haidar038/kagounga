@@ -49,12 +49,28 @@ serve(async (req) => {
     }
 
     try {
+        console.log("=== SHIPPING-CALCULATE FUNCTION CALLED ===");
+
+        // Validate environment
+        const hasApiKey = !!BITESHIP_API_KEY;
+        console.log("Environment Check:", {
+            hasBiteshipApiKey: hasApiKey,
+            biteshipTestApiKey: hasApiKey ? "✅ Configured" : "❌ Missing",
+            priorityCouriers: PRIORITY_COURIERS,
+        });
+
         const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "");
 
         const requestBody: CalculateShippingRequest = await req.json();
         const { originCity, destinationCity, destinationPostalCode, items, totalWeight } = requestBody;
 
-        console.log("Calculating shipping:", { originCity, destinationCity, itemCount: items.length });
+        console.log("Request Details:", {
+            originCity,
+            destinationCity,
+            destinationPostalCode,
+            itemCount: items.length,
+            requestedWeight: totalWeight,
+        });
 
         // Calculate total weight if not provided
         let weightInKg = totalWeight || 0;
@@ -111,7 +127,9 @@ serve(async (req) => {
         console.log("Inter-city delivery detected, calling Biteship API");
 
         if (!BITESHIP_API_KEY) {
-            console.error("Biteship API key not configured - returning fallback rates");
+            console.error("❌ BITESHIP API KEY NOT CONFIGURED");
+            console.error("Please set BITESHIP_TEST_API_KEY in Supabase Secrets");
+            console.error("Returning fallback rates (hardcoded)");
 
             // Return basic fallback options when API is not configured
             const fallbackOptions: ShippingOption[] = [
@@ -137,6 +155,7 @@ serve(async (req) => {
                 },
             ];
 
+            console.warn("⚠️ Returning fallback - only 2 couriers available");
             return new Response(
                 JSON.stringify({
                     success: true,
@@ -254,15 +273,30 @@ serve(async (req) => {
         }
 
         // Request rates from Biteship
+        const originAreaId = Deno.env.get("BITESHIP_ORIGIN_AREA_ID");
         const ratesPayload = {
-            origin_area_id: Deno.env.get("BITESHIP_ORIGIN_AREA_ID") || "ternate_area_id", // Need to get this from Biteship
+            origin_area_id: originAreaId || undefined,
             destination_area_id: destinationAreaId,
-            destination_postal_code: destinationPostalCode,
+            destination_postal_code: destinationPostalCode ? parseInt(destinationPostalCode) : undefined,
             couriers: PRIORITY_COURIERS.join(","),
             items: biteshipItems,
         };
 
-        console.log("Requesting rates from Biteship:", ratesPayload);
+        // Remove undefined fields
+        Object.keys(ratesPayload).forEach((key) => {
+            if (ratesPayload[key] === undefined) {
+                delete ratesPayload[key];
+            }
+        });
+
+        console.log("📦 Biteship Rates API Request:", {
+            hasOriginAreaId: !!originAreaId,
+            hasDestinationAreaId: !!destinationAreaId,
+            hasPostalCode: !!destinationPostalCode,
+            requestedCouriers: PRIORITY_COURIERS,
+            itemCount: biteshipItems.length,
+        });
+        console.log("Full payload:", JSON.stringify(ratesPayload, null, 2));
 
         const ratesResponse = await fetch(`${BITESHIP_API_URL}/rates/couriers`, {
             method: "POST",
@@ -275,8 +309,10 @@ serve(async (req) => {
 
         if (!ratesResponse.ok) {
             const errorText = await ratesResponse.text();
-            console.error("Biteship rates API error:", errorText);
-            console.error("Request payload:", JSON.stringify(ratesPayload));
+            console.error("❌ BITESHIP RATES API ERROR:", ratesResponse.status);
+            console.error("Error response:", errorText);
+            console.error("Request payload:", JSON.stringify(ratesPayload, null, 2));
+            console.error("Falling back to hardcoded rates");
 
             // Return fallback instead of throwing error
             const fallbackOptions: ShippingOption[] = [
@@ -307,7 +343,15 @@ serve(async (req) => {
         }
 
         const ratesData = await ratesResponse.json();
+        console.log("✅ Biteship API Success!");
         console.log(`Received ${ratesData.pricing?.length || 0} rate options from Biteship`);
+
+        if (ratesData.pricing && ratesData.pricing.length > 0) {
+            console.log(
+                "Available couriers:",
+                ratesData.pricing.map((p) => `${p.courier_name} (${p.courier_service_name})`)
+            );
+        }
 
         // Process rates
         if (ratesData.pricing && Array.isArray(ratesData.pricing)) {
@@ -349,6 +393,16 @@ serve(async (req) => {
 
         // Sort by price (cheapest first)
         shippingOptions.sort((a, b) => a.price - b.price);
+
+        console.log(`📊 Returning ${shippingOptions.length} shipping options`);
+        console.log(
+            "Final options:",
+            shippingOptions.map((o) => ({
+                courier: o.courierName,
+                service: o.serviceName,
+                price: o.price,
+            }))
+        );
 
         return new Response(
             JSON.stringify({

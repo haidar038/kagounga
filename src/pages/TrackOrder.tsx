@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { Loader2, Package, Truck, Check, Clock, XCircle, Mail, Search } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { SEO } from "@/components/SEO";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface OrderItem {
     id: string;
@@ -37,6 +38,7 @@ type Step = "input" | "loading" | "success";
 const TrackOrder = () => {
     const [searchParams] = useSearchParams();
     const tokenFromUrl = searchParams.get("token");
+    const { user } = useAuth();
 
     const [step, setStep] = useState<Step>(tokenFromUrl ? "loading" : "input");
     const [email, setEmail] = useState("");
@@ -45,11 +47,18 @@ const TrackOrder = () => {
     const [order, setOrder] = useState<Order | null>(null);
 
     // Auto-load order if token is in URL
-    useState(() => {
+    useEffect(() => {
         if (tokenFromUrl) {
             loadOrderWithToken(tokenFromUrl);
         }
-    });
+    }, [tokenFromUrl]);
+
+    // Auto-fill email for authenticated users
+    useEffect(() => {
+        if (user?.email && !email) {
+            setEmail(user.email);
+        }
+    }, [user]);
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat("id-ID", {

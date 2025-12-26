@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Menu, X, Search, User, LogOut, Shield } from "lucide-react";
+import { ShoppingCart, Menu, X, Search, User, LogOut, Shield, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/contexts/AuthContext";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -91,6 +91,13 @@ export function Navbar() {
                                                     </Link>
                                                 </DropdownMenuItem>
                                             )}
+                                            <DropdownMenuItem asChild>
+                                                <Link to="/my-orders" className="cursor-pointer">
+                                                    <Package className="h-4 w-4 mr-2" />
+                                                    Pesanan Saya
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                                                 <LogOut className="h-4 w-4 mr-2" />
                                                 {t("nav.signOut")}
@@ -126,6 +133,9 @@ export function Navbar() {
                                             {t("nav.adminDashboard")}
                                         </Link>
                                     )}
+                                    <Link to="/my-orders" className="rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-secondary hover:text-foreground" onClick={() => setIsOpen(false)}>
+                                        Pesanan Saya
+                                    </Link>
                                     <button
                                         onClick={() => {
                                             handleSignOut();

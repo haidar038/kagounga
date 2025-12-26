@@ -70,39 +70,84 @@ serve(async (req) => {
     }
 
     try {
+        console.log("=== SHIPPING-CREATE FUNCTION CALLED ===");
+
+        // Validate environment variables
+        const hasApiKey = !!BITESHIP_API_KEY;
+        console.log("Environment Check:", {
+            hasBiteshipApiKey: hasApiKey,
+            biteshipApiUrl: BITESHIP_API_URL,
+        });
+
         // Create Supabase client with service role for admin access
         const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
 
         const requestBody: CreateShipmentRequest = await req.json();
         const { orderId, courierCode, serviceCode, courierName, serviceName, isLocalDelivery } = requestBody;
 
-        console.log("Creating shipment for order:", orderId);
+        console.log("Request Payload:", {
+            orderId,
+            courierCode,
+            courierName,
+            serviceCode,
+            serviceName,
+            isLocalDelivery,
+        });
+
+        // Validate required fields
+        if (!orderId) {
+            throw new Error("Missing required field: orderId");
+        }
+        if (!courierCode) {
+            throw new Error("Missing required field: courierCode");
+        }
+        if (!serviceCode) {
+            throw new Error("Missing required field: serviceCode");
+        }
+
+        console.log("✅ All required fields validated");
+        console.log(`Fetching order details for: ${orderId}`);
 
         // Get order details
         const { data: order, error: orderError } = await supabase.from("orders").select("*").eq("id", orderId).single();
 
         if (orderError || !order) {
-            throw new Error("Order not found");
+            console.error("Order fetch error:", orderError);
+            throw new Error(`Order not found: ${orderId}`);
         }
 
-        // Get order items with product details (including weight)
-        const { data: orderItems, error: itemsError } = await supabase
-            .from("order_items")
-            .select(
-                `
-                *,
-                products (
-                    weight_kg,
-                    length_cm,
-                    width_cm,
-                    height_cm
-                )
-            `
-            )
-            .eq("order_id", orderId);
+        console.log("Order found:", {
+            orderId: order.id,
+            customerName: order.customer_name,
+            city: order.city,
+            postalCode: order.postal_code,
+        });
+
+        // Get order items (without products join - product_id is TEXT without FK)
+        const { data: orderItems, error: itemsError } = await supabase.from("order_items").select("*").eq("order_id", orderId);
 
         if (itemsError) {
             console.error("Error fetching order items:", itemsError);
+        }
+
+        // Fetch product details separately if we have order items
+        const productsMap: Record<string, any> = {};
+        if (orderItems && orderItems.length > 0) {
+            const productIds = orderItems.map((item: any) => item.product_id).filter(Boolean);
+
+            if (productIds.length > 0) {
+                const { data: products, error: productsError } = await supabase.from("products").select("id, weight_kg, length_cm, width_cm, height_cm").in("id", productIds);
+
+                if (productsError) {
+                    console.error("Error fetching products:", productsError);
+                } else if (products) {
+                    // Create a map of product id -> product data
+                    products.forEach((product: any) => {
+                        productsMap[product.id] = product;
+                    });
+                    console.log(`Fetched ${products.length} products for weight/dimension data`);
+                }
+            }
         }
 
         // ===== LOCAL DELIVERY =====
@@ -150,8 +195,8 @@ serve(async (req) => {
         // Prepare items for Biteship with actual product weights and dimensions
         const biteshipItems =
             orderItems?.map((item: any) => {
-                // Get product data from the joined table
-                const product = item.products;
+                // Get product data from the separately fetched products map
+                const product = productsMap[item.product_id];
 
                 // Convert weight from kg to grams
                 const weightInGrams = product?.weight_kg ? Math.round(product.weight_kg * 1000) : DEFAULT_PRODUCT_WEIGHT;
@@ -214,6 +259,7 @@ serve(async (req) => {
         }
 
         // Create shipment order in Biteship
+        // Default to "drop_off" since many remote areas (like Ternate) don't support pickup
         const orderPayload = {
             shipper_contact_name: Deno.env.get("STORE_NAME") || "Kagounga Store",
             shipper_contact_phone: Deno.env.get("STORE_PHONE") || "081234567890",
@@ -223,7 +269,7 @@ serve(async (req) => {
             ...destinationPayload,
             courier_company: courierCode,
             courier_type: serviceCode,
-            delivery_type: "now",
+            delivery_type: "drop_off", // Use drop_off to avoid pickup unavailability in remote areas
             order_note: `Order #${order.external_id || order.id}`,
             reference_id: order.external_id || order.id, // For easier reference
             items: biteshipItems,
@@ -231,7 +277,7 @@ serve(async (req) => {
 
         console.log("Creating Biteship order with payload:", JSON.stringify(orderPayload, null, 2));
 
-        const biteshipResponse = await fetch(`${BITESHIP_API_URL}/orders`, {
+        let biteshipResponse = await fetch(`${BITESHIP_API_URL}/orders`, {
             method: "POST",
             headers: {
                 Authorization: BITESHIP_API_KEY,
@@ -240,18 +286,78 @@ serve(async (req) => {
             body: JSON.stringify(orderPayload),
         });
 
-        const responseText = await biteshipResponse.text();
+        let responseText = await biteshipResponse.text();
+
+        // If drop_off fails, try with "later" delivery type as another fallback
+        if (!biteshipResponse.ok) {
+            const errorJson = JSON.parse(responseText);
+            const errorCode = errorJson.code;
+
+            console.warn(`First attempt failed (code: ${errorCode}), trying with 'later' delivery type...`);
+
+            // Retry with "later" delivery type
+            const retryPayload = { ...orderPayload, delivery_type: "later" };
+
+            biteshipResponse = await fetch(`${BITESHIP_API_URL}/orders`, {
+                method: "POST",
+                headers: {
+                    Authorization: BITESHIP_API_KEY,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(retryPayload),
+            });
+
+            responseText = await biteshipResponse.text();
+        }
 
         if (!biteshipResponse.ok) {
             console.error("Biteship order creation error:", responseText);
 
             // Try to parse error details
             let errorDetails = responseText;
+            let errorCode = "";
             try {
                 const errorJson = JSON.parse(responseText);
                 errorDetails = errorJson.error || errorJson.message || responseText;
+                errorCode = errorJson.code || "";
             } catch (e) {
                 // Keep raw text if not JSON
+            }
+
+            // Check if this is a courier unavailability error (40002031)
+            // In this case, gracefully mark for manual handling instead of failing
+            if (errorCode === "40002031" || errorDetails.includes("cannot provide pickup service") || errorDetails.includes("courier")) {
+                console.warn(`⚠️ Courier ${courierCode} is not available in this area. Marking for manual shipment.`);
+
+                // Update order to indicate manual shipment is needed
+                const { error: updateError } = await supabase
+                    .from("orders")
+                    .update({
+                        courier_code: courierCode,
+                        courier_name: courierName,
+                        service_code: serviceCode,
+                        service_name: serviceName,
+                        is_local_delivery: false,
+                        shipping_notes: `⚠️ Kurir ${courierName} tidak tersedia di area ini. Silakan buat pengiriman manual di Biteship Dashboard atau gunakan kurir lain.`,
+                    })
+                    .eq("id", orderId);
+
+                if (updateError) {
+                    console.error("Error updating order:", updateError);
+                }
+
+                return new Response(
+                    JSON.stringify({
+                        success: true, // Mark as success so webhook doesn't fail
+                        isLocal: false,
+                        requiresManualShipment: true,
+                        courierName,
+                        serviceName,
+                        message: `Kurir ${courierName} tidak tersedia di area asal. Admin perlu membuat pengiriman secara manual.`,
+                        reason: errorDetails,
+                    }),
+                    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
             }
 
             throw new Error(`Biteship API Error (${biteshipResponse.status}): ${errorDetails}`);

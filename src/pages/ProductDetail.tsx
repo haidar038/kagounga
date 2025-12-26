@@ -5,14 +5,23 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useProduct } from "@/hooks/useProducts";
-import { useCart } from "@/contexts/CartContext";
+import { useProductVariants } from "@/hooks/useProductVariants";
+import { useCart } from "@/hooks/useCart";
 import { SEO, ProductSchema, BreadcrumbSchema } from "@/components/SEO";
+import { ReviewForm } from "@/components/product/ReviewForm";
+import { ReviewList } from "@/components/product/ReviewList";
+import { VariantSelector } from "@/components/product/VariantSelector";
+import { ProductVariant } from "@/types/product";
 
 const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
     const { product, loading, error } = useProduct(slug);
     const [quantity, setQuantity] = useState(1);
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(undefined);
     const { addItem } = useCart();
+
+    // Fetch variants if product has variants
+    const { data: variants } = useProductVariants(product?.id || "");
 
     // Loading state
     if (loading) {
@@ -80,7 +89,11 @@ const ProductDetail = () => {
     };
 
     const handleAddToCart = () => {
-        addItem(product, quantity);
+        if (product.has_variants && !selectedVariant) {
+            alert("Please select a variant first");
+            return;
+        }
+        addItem(product, quantity, selectedVariant);
     };
 
     return (
@@ -150,6 +163,21 @@ const ProductDetail = () => {
 
                             {/* Description */}
                             <p className="mt-6 text-muted">{product.longDescription || product.description}</p>
+
+                            {/* Variant Selector */}
+                            {product.has_variants && variants && variants.length > 0 && (
+                                <div className="mt-6">
+                                    <VariantSelector
+                                        variants={variants}
+                                        selectedVariant={selectedVariant}
+                                        onVariantChange={(variant) => {
+                                            setSelectedVariant(variant);
+                                            // Reset quantity to not exceed variant stock
+                                            setQuantity(Math.min(quantity, variant.stock));
+                                        }}
+                                    />
+                                </div>
+                            )}
 
                             {/* Quantity & Add to Cart */}
                             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -224,6 +252,19 @@ const ProductDetail = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+
+                    {/* Reviews Section */}
+                    <div className="mt-16">
+                        <h2 className="font-heading text-3xl font-bold mb-8">Customer Reviews</h2>
+
+                        {/* Review Form */}
+                        <div className="mb-8">
+                            <ReviewForm productId={product.id} productName={product.name} />
+                        </div>
+
+                        {/* Review List */}
+                        <ReviewList productId={product.id} />
                     </div>
                 </div>
             </div>
