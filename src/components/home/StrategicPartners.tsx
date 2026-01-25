@@ -1,25 +1,22 @@
 import { useTranslation } from "react-i18next";
 
 const partnerLogos = [
-    { name: "Arunika", logo: "/partners/Arunika.svg" },
+    { name: "Radio Insania Network", logo: "/partners/RadioInsaniaNetwork.png" },
     { name: "Bank Indonesia", logo: "/partners/BankIndonesia.png" },
     { name: "Bela Hotel", logo: "/partners/BelaHotel.svg" },
-    { name: "Dispar", logo: "/partners/Dispar2.svg" },
+    { name: "RRI Ternate", logo: "/partners/RRI_Ternate_2023.svg" },
     { name: "Hypermart", logo: "/partners/Logo_Hypermart.svg" },
     { name: "Netrilis", logo: "/partners/Netrilis.png" },
     { name: "Pos Indonesia", logo: "/partners/POSIND.svg" },
-    { name: "Puta Dino", logo: "/partners/PutaDino.png" },
-    { name: "RRI Ternate", logo: "/partners/RRI_Ternate_2023.svg" },
-    { name: "Radio Insania Network", logo: "/partners/RadioInsaniaNetwork.png" },
     { name: "Wonderful Ternate", logo: "/partners/WonderfulTeranate.PNG" },
+    { name: "Puta Dino", logo: "/partners/PutaDino.png" },
+    { name: "Dispar", logo: "/partners/Dispar2.svg" },
+    { name: "Arunika", logo: "/partners/Arunika.svg" },
     { name: "Halmaheranesia", logo: "/partners/halmaheranesia.svg" },
 ];
 
 export function StrategicPartners() {
     const { t } = useTranslation();
-
-    // Duplicate the logos array for seamless infinite loop
-    const duplicatedLogos = [...partnerLogos, ...partnerLogos];
 
     return (
         <section className="py-12 sm:py-16 bg-background overflow-hidden">
@@ -33,35 +30,101 @@ export function StrategicPartners() {
             {/* Infinite Carousel */}
             <div className="relative">
                 {/* Gradient overlays for fade effect */}
-                <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
-                <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
+                <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10" />
+                <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10" />
 
-                {/* Scrolling track */}
-                <div className="flex items-center animate-scroll gap-16 sm:gap-20">
-                    {duplicatedLogos.map((partner, idx) => (
-                        <div key={`${partner.name}-${idx}`} className="flex-shrink-0">
-                            <div className="flex items-center justify-center h-10 sm:h-12 w-28 sm:w-32">
+                {/* Scrolling track - contains two identical sets for seamless loop */}
+                <div className="partner-scroll-container">
+                    <div className="partner-scroll-track">
+                        {/* First set */}
+                        {partnerLogos.map((partner, idx) => (
+                            <div key={`set1-${partner.name}-${idx}`} className="partner-item">
                                 <img src={partner.logo} alt={partner.name} className="h-full w-auto object-contain filter grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300" loading="lazy" />
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                        {/* Second set (duplicate for seamless loop) */}
+                        {partnerLogos.map((partner, idx) => (
+                            <div key={`set2-${partner.name}-${idx}`} className="partner-item">
+                                <img src={partner.logo} alt={partner.name} className="h-full w-auto object-contain filter grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300" loading="lazy" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             <style>{`
-                @keyframes scroll {
+                .partner-scroll-container {
+                    width: 100%;
+                    overflow: hidden;
+                }
+                
+                .partner-scroll-track {
+                    display: flex;
+                    gap: 3rem;
+                    width: max-content;
+                    animation: partner-scroll 20s linear infinite;
+                }
+                
+                .partner-item {
+                    flex-shrink: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 2.5rem;
+                    width: 7rem;
+                }
+                
+                @keyframes partner-scroll {
                     0% {
                         transform: translateX(0);
                     }
                     100% {
-                        transform: translateX(-50%);
+                        transform: translateX(calc(-50% - 1.5rem));
                     }
                 }
-                .animate-scroll {
-                    animation: scroll 30s linear infinite;
-                }
-                .animate-scroll:hover {
+                
+                .partner-scroll-track:hover {
                     animation-play-state: paused;
+                }
+                
+                /* Faster animation on mobile */
+                @media (max-width: 640px) {
+                    .partner-scroll-track {
+                        gap: 2.5rem;
+                        animation-duration: 15s;
+                    }
+                    .partner-item {
+                        height: 2rem;
+                        width: 5.5rem;
+                    }
+                    @keyframes partner-scroll {
+                        0% {
+                            transform: translateX(0);
+                        }
+                        100% {
+                            transform: translateX(calc(-50% - 1.25rem));
+                        }
+                    }
+                }
+                
+                /* Larger screens */
+                @media (min-width: 767.9px) {
+                    .partner-scroll-track {
+                        gap: 4rem;
+                        animation-duration: 70s;
+                    }
+                    .partner-item {
+                        height: 3rem;
+                        width: 8rem;
+                    }
+                    @keyframes partner-scroll {
+                        0% {
+                            transform: translateX(0);
+                        }
+                        100% {
+                            transform: translateX(calc(-50% - 2rem));
+                        }
+                    }
                 }
             `}</style>
         </section>

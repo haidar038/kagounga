@@ -68,6 +68,7 @@ export function SignatureProduct() {
                 <div className="text-center mb-12">
                     <p className="section-label mb-3">{t("home.whyChooseUs")}</p>
                     <h2 className="font-heading text-3xl font-bold sm:text-4xl">{t("home.signatureTitle")}</h2>
+                    <p className="text-muted mt-4">{t("home.signatureDescription")}</p>
                 </div>
 
                 {/* Points Grid */}
