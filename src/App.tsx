@@ -15,6 +15,7 @@ import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Music from "./pages/Music";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import Auth from "./pages/Auth";
@@ -45,6 +46,7 @@ const App = () => (
                                 <Route path="/checkout/success" element={<CheckoutSuccess />} />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/contact" element={<Contact />} />
+                                <Route path="/music" element={<Music />} />
                                 <Route path="/news" element={<News />} />
                                 <Route path="/news/:slug" element={<NewsDetail />} />
                                 <Route path="/auth" element={<Auth />} />

@@ -1,10 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { Wheat, Timer, HeartPulse, UtensilsCrossed, Star, Sprout, Soup, LucideIcon } from "lucide-react";
+import { TreePalm, HandHeartIcon, Eye, Palette, Wheat, Timer, HeartPulse, UtensilsCrossed, Star, Sprout, Soup, LucideIcon } from "lucide-react";
 
 // Icon mapping
 const iconMap: Record<string, LucideIcon> = {
+    "tree-palm": TreePalm,
+    "hand-heart": HandHeartIcon,
+    eye: Eye,
+    palette: Palette,
     wheat: Wheat,
     timer: Timer,
     "heart-pulse": HeartPulse,

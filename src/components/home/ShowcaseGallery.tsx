@@ -101,7 +101,7 @@ export function ShowcaseGallery() {
                 {/* Section Header */}
                 <div className="text-center mb-12">
                     <p className="section-label mb-3">Showcase</p>
-                    <h2 className="font-heading text-3xl font-bold sm:text-4xl">Moloku's Gateway</h2>
+                    <h2 className="font-heading text-3xl font-bold sm:text-4xl">Kagōunga's Gateway</h2>
                 </div>
 
                 {/* Gallery Grid */}

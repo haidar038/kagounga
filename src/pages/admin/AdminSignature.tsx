@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, Plus, Pencil, Trash2, Loader2, Star, Leaf, Award, Heart, Sparkles, Coffee } from "lucide-react";
+import { TreePalm, HandHeartIcon, Eye, Palette, ChevronLeft, Plus, Pencil, Trash2, Wheat, Timer, HeartPulse, UtensilsCrossed, Sprout, Soup, Loader2, Star, Leaf, Award, Heart, Sparkles, Coffee } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,16 @@ const iconOptions = [
     { value: "heart", label: "Heart", icon: Heart },
     { value: "sparkles", label: "Sparkles", icon: Sparkles },
     { value: "coffee", label: "Coffee", icon: Coffee },
+    { value: "tree-palm", label: "Tree Palm", icon: TreePalm },
+    { value: "hand-heart", label: "Hand Heart", icon: HandHeartIcon },
+    { value: "eye", label: "Eye", icon: Eye },
+    { value: "palette", label: "Palette", icon: Palette },
+    { value: "wheat", label: "Wheat", icon: Wheat },
+    { value: "timer", label: "Timer", icon: Timer },
+    { value: "heart-pulse", label: "Heart Pulse", icon: HeartPulse },
+    { value: "utensils-crossed", label: "Utensils Crossed", icon: UtensilsCrossed },
+    { value: "sprout", label: "Sprout", icon: Sprout },
+    { value: "soup", label: "Soup", icon: Soup },
 ];
 
 const getIconComponent = (iconName: string) => {

@@ -26,12 +26,6 @@ export function HeroNew() {
             {/* Content */}
             <div className="container-page relative z-10 py-20 text-center">
                 <div className="mx-auto max-w-3xl animate-fade-in">
-                    {/* Badge */}
-                    <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-card/20 backdrop-blur-sm px-4 py-1.5 text-sm font-medium text-white/90 border border-white/20">
-                        <span>🌴</span>
-                        <span>{t("hero.badge")}</span>
-                    </div>
-
                     {/* Headline */}
                     <h1 className="font-heading text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl" id="hero-description">
                         {t("hero.headline")}{" "}

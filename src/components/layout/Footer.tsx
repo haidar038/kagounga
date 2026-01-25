@@ -25,7 +25,7 @@ export function Footer() {
                                 <img className="h-5 w-5" src="https://cdn.simpleicons.org/instagram/535353" alt="Instagram" loading="lazy" />
                             </a>
                             <a target="_blank" href="https://www.facebook.com/profile.php?id=61563199222858&mibextid=ZbWKwL" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="Facebook">
-                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/facebook/535353" alt="Facebook" loading="lazy" />
+                                <img className="h-5 w-5" src="https://cdn.simpleicons.org/tiktok/535353" alt="TikTok" loading="lazy" />
                             </a>
                             <a target="_blank" href="https://x.com/kagounga" className="rounded-lg bg-secondary p-3 text-muted transition-colors hover:text-foreground" aria-label="X (Twitter)">
                                 <img className="h-5 w-5" src="https://cdn.simpleicons.org/x/535353" alt="X" loading="lazy" />
@@ -61,6 +61,11 @@ export function Footer() {
                             <li>
                                 <Link to="/products" className="text-muted transition-colors hover:text-foreground">
                                     {t("nav.products")}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/music" className="text-muted transition-colors hover:text-foreground">
+                                    {t("nav.music")}
                                 </Link>
                             </li>
                         </ul>

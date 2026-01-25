@@ -185,7 +185,7 @@ const Contact = () => {
                         <p className="mt-4 text-muted">{t("contact.mapDescription")}</p>
                     </div>
 
-                    <LocationMap latitude={0.7893} longitude={127.3748} locationName="Kagōunga Store" address="Jl. Pertamina, Jambula, Ternate, Maluku Utara 97719" />
+                    <LocationMap latitude={0.75969} longitude={127.3175006} locationName="Kagōunga Store" address="Jl. Pertamina, Jambula, Ternate, Maluku Utara 97719" />
 
                     <p className="mt-4 text-center text-sm text-muted">💡 {t("contact.mapHint")}</p>
                 </div>

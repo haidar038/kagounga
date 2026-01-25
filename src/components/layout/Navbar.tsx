@@ -22,6 +22,7 @@ export function Navbar() {
         { href: "/news", label: t("nav.news") },
         { href: "/contact", label: t("nav.contact") },
         { href: "/products", label: t("nav.product") },
+        { href: "/music", label: t("nav.music") },
     ];
 
     const handleSignOut = async () => {

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Heart, CircleCheckBig, Users2, Orbit } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SEO } from "@/components/SEO";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 // Mock Data for Core Attendant
 const teamMembers = [
@@ -9,16 +11,53 @@ const teamMembers = [
     { name: "Aiya Lee", position: "Co-Founder & CMO", image: "https://kagounga.id/wp-content/uploads/2024/08/Aiya.jpg" },
     { name: "Maryam Helida", position: "Graphic Designer", image: "https://kagounga.id/wp-content/uploads/2024/08/WhatsApp-Image-2024-08-05-at-03.15.16_e895f0b1-scaled.jpg" },
     { name: "Shahnaz Salsabila", position: "Visual Artist", image: "https://kagounga.id/wp-content/uploads/2024/08/Anaz.jpg" },
-    { name: "Yogo Anumerta", position: "Web Developer", image: "https://kagounga.id/wp-content/uploads/2025/08/11zon_resized.png" },
+    { name: "M. Khaidar", position: "Web Developer", image: "https://i.ibb.co.com/C3pbzLb1/hdr.webp" },
     { name: "Arunika & Co.", position: "Lead Photographer", image: "https://kagounga.id/wp-content/uploads/2024/08/WhatsApp-Image-2024-08-06-at-22.33.45_30ced1a1.jpg" },
     { name: "Sabey Oscar", position: "Lighting Specialist", image: "https://kagounga.id/wp-content/uploads/2024/08/Sabey.jpg" },
     { name: "Andy Taku", position: "Music Composer", image: "https://kagounga.id/wp-content/uploads/2024/08/andy-bw.webp" },
+];
+
+// Collaborators Data
+interface Collaborator {
+    name: string;
+    role: string;
+    image: string;
+    description: string;
+}
+
+const collaborators: Collaborator[] = [
+    {
+        name: "Partner One",
+        role: "Graphic Designer",
+        image: "https://kagounga.id/wp-content/uploads/2024/08/WhatsApp-Image-2024-08-05-at-03.15.16_e895f0b1-scaled.jpg",
+        description:
+            "A dedicated community of local fishermen who provide the freshest ingredients directly from the waters of North Maluku. Their expertise and sustainable practices ensure the highest quality of raw materials for our products.",
+    },
+    {
+        name: "Partner Two",
+        role: "Visual Artist",
+        image: "https://kagounga.id/wp-content/uploads/2024/08/Anaz.jpg",
+        description: "Skilled artisans who have mastered the traditional techniques of sago processing passed down through generations. They bring authenticity and cultural heritage to every product we create together.",
+    },
+    {
+        name: "Partner Three",
+        role: "Graphic Designer",
+        image: "https://kagounga.id/wp-content/uploads/2024/08/WhatsApp-Image-2024-08-05-at-03.15.16_e895f0b1-scaled.jpg",
+        description: "Expert quality controllers who ensure every batch meets our rigorous standards. Their attention to detail guarantees consistency and excellence in all Kagōunga products.",
+    },
+    {
+        name: "Partner Four",
+        role: "Visual Artist",
+        image: "https://kagounga.id/wp-content/uploads/2024/08/Anaz.jpg",
+        description: "Our trusted logistics partners who ensure that Kagōunga products reach customers fresh and on time. They connect the flavors of North Maluku to households across Indonesia and beyond.",
+    },
 ];
 
 const About = () => {
     const { t } = useTranslation();
     const heroBackground = "https://kagounga.id/wp-content/uploads/2024/07/about-us.webp";
     const mainCoreBg = "https://kagounga.id/wp-content/uploads/2024/08/about-us-3.webp";
+    const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
 
     const values = [
         {
@@ -121,7 +160,7 @@ const About = () => {
                 </div>
             </section>
 
-            {/* 4. Our Process (Let's Talk Taste) */}
+            {/* 4. Collaborators */}
             <section
                 className="relative py-16 sm:py-24 bg-cover bg-center"
                 style={{
@@ -131,37 +170,44 @@ const About = () => {
                 <div className="absolute inset-0 bg-black/60" /> {/* Dark Overlay */}
                 <div className="container-page relative z-10 transition-all">
                     <div className="mx-auto mb-16 max-w-2xl text-center">
-                        <p className="section-label text-white/90 mb-2">{t("about.ourProcess")}</p>
-                        <h2 className="font-heading text-3xl font-bold sm:text-4xl text-white">{t("about.letsTalkTaste")}</h2>
+                        <p className="section-label text-white/90 mb-2">{t("about.collaborators")}</p>
+                        <h2 className="font-heading text-3xl font-bold sm:text-4xl text-white">{t("about.ourPartners")}</h2>
                     </div>
 
-                    <div className="grid gap-8 md:grid-cols-3">
-                        <div className="flex flex-col items-center text-center rounded-3xl bg-white backdrop-blur-md p-8 shadow-lg">
-                            <div className="mb-6 flex h-32 w-32 items-center justify-center p-2">
-                                <img src="https://kagounga.id/wp-content/uploads/2024/08/fish.png" alt="Harvesting" className="h-full w-full object-contain drop-shadow-md" loading="lazy" />
+                    <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
+                        {collaborators.map((collaborator, idx) => (
+                            <div key={idx} className="group relative aspect-[3/4] overflow-hidden rounded-2xl sm:rounded-3xl cursor-pointer" onClick={() => setSelectedCollaborator(collaborator)}>
+                                <img src={collaborator.image} alt={collaborator.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+                                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                                    <h3 className="font-heading text-lg sm:text-xl font-bold text-white">{collaborator.name}</h3>
+                                    <p className="text-white/70 text-sm mt-1">{collaborator.role}</p>
+                                </div>
                             </div>
-                            <h3 className="font-heading text-xl font-bold mb-3 text-slate-900">{t("about.harvestingTitle")}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">{t("about.harvestingDesc")}</p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center rounded-3xl bg-white backdrop-blur-md p-8 shadow-lg">
-                            <div className="mb-6 flex h-32 w-32 items-center justify-center p-2">
-                                <img src="https://kagounga.id/wp-content/uploads/2024/08/hand.png" alt="Artisan Crafting" className="h-full w-full object-contain drop-shadow-md" loading="lazy" />
-                            </div>
-                            <h3 className="font-heading text-xl font-bold mb-3 text-slate-900">{t("about.artisanTitle")}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">{t("about.artisanDesc")}</p>
-                        </div>
-
-                        <div className="flex flex-col items-center text-center rounded-3xl bg-white backdrop-blur-md p-8 shadow-lg">
-                            <div className="mb-6 flex h-32 w-32 items-center justify-center p-2">
-                                <img src="https://kagounga.id/wp-content/uploads/2024/08/bowl.png" alt="Quality Assurance" className="h-full w-full object-contain drop-shadow-md" loading="lazy" />
-                            </div>
-                            <h3 className="font-heading text-xl font-bold mb-3 text-slate-900">{t("about.qualityTitle")}</h3>
-                            <p className="text-slate-600 leading-relaxed text-sm">{t("about.qualityDesc")}</p>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
+
+            {/* Collaborator Profile Dialog */}
+            <Dialog open={!!selectedCollaborator} onOpenChange={() => setSelectedCollaborator(null)}>
+                <DialogContent className="sm:max-w-lg">
+                    {selectedCollaborator && (
+                        <>
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20">
+                                    <img src={selectedCollaborator.image} alt={selectedCollaborator.name} className="w-full h-full object-cover" />
+                                </div>
+                                <DialogHeader className="text-center">
+                                    <DialogTitle className="text-2xl text-center">{selectedCollaborator.name}</DialogTitle>
+                                    <p className="text-accent font-medium text-center">{selectedCollaborator.role}</p>
+                                </DialogHeader>
+                            </div>
+                            <DialogDescription className="text-center text-base leading-relaxed mt-4">{selectedCollaborator.description}</DialogDescription>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
 
             {/* 5. Commitment */}
             <section className="py-16 sm:py-24 bg-primary text-primary-foreground">
