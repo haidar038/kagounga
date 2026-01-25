@@ -31,7 +31,6 @@ export function HeroNew() {
                         {t("hero.headline")}{" "}
                         <span className="relative inline-block">
                             <span className="relative z-10 text-primary">{t("hero.highlightedText")}</span>
-                            <span className="absolute bottom-1 left-0 h-3 w-full bg-primary/30" />
                         </span>
                     </h1>
 
