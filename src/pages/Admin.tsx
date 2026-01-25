@@ -2,7 +2,7 @@ import { Link, Routes, Route } from "react-router-dom";
 import { LayoutDashboard, Newspaper, Image, FileText, Megaphone, ChevronLeft, LogOut, Users, Package, BarChart3, MessageSquare, TrendingUp, Activity, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import AdminUsers from "./AdminUsers";
+import AdminUsers from "./admin/AdminUsers";
 import AdminNews from "./admin/AdminNews";
 import AdminGallery from "./admin/AdminGallery";
 import AdminSignature from "./admin/AdminSignature";
@@ -63,12 +63,6 @@ const Admin = () => {
             <header className="border-b border-border bg-card">
                 <div className="container-page py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link to="/">
-                            <Button variant="ghost" size="sm">
-                                <ChevronLeft className="h-4 w-4 mr-1" />
-                                Back to Site
-                            </Button>
-                        </Link>
                         <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
                                 <LayoutDashboard className="h-4 w-4 text-accent-foreground" />

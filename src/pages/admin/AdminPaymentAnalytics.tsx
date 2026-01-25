@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { TrendingUp, DollarSign, CheckCircle, XCircle, CreditCard, RefreshCw } from "lucide-react";
+import { TrendingUp, DollarSign, CheckCircle, XCircle, CreditCard, RefreshCw, ChevronLeft } from "lucide-react";
 import { usePaymentAnalytics } from "@/hooks/usePaymentAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, PieChart, Pie, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import { Link } from "react-router-dom";
 
 const COLORS = ["#0ea5e9", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
@@ -117,7 +118,13 @@ export default function AdminPaymentAnalytics() {
         }));
 
     return (
-        <div className="container mx-auto py-8 px-4">
+        <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
@@ -126,7 +133,7 @@ export default function AdminPaymentAnalytics() {
                     </h1>
                     <p className="text-gray-600">{t("Monitor payment performance and statistics")}</p>
                 </div>
-                <Button onClick={refresh} variant="outline">
+                <Button onClick={refresh} variant="outline" className="bg-white">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     {t("Refresh")}
                 </Button>

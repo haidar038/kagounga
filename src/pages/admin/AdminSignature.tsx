@@ -163,16 +163,14 @@ const AdminSignature = () => {
 
     return (
         <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-4">
-                    <Link to="/admin">
-                        <Button variant="ghost" size="sm">
-                            <ChevronLeft className="h-4 w-4 mr-1" />
-                            Back
-                        </Button>
-                    </Link>
-                    <h1 className="font-heading text-3xl font-bold">Signature Points</h1>
-                </div>
+                <h1 className="font-heading text-3xl font-bold">Signature Points</h1>
                 <Button onClick={openCreateDialog}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Point

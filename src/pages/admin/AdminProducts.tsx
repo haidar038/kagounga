@@ -148,14 +148,14 @@ const AdminProducts = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Link to="/admin">
-                        <Button variant="ghost" size="sm">
-                            <ChevronLeft className="h-4 w-4 mr-1" />
-                            Back
-                        </Button>
-                    </Link>
                     <div>
                         <h1 className="font-heading text-3xl font-bold">Product Management</h1>
                         <p className="text-muted mt-1">Manage products, categories, and inventory</p>
@@ -171,10 +171,10 @@ const AdminProducts = () => {
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                    <Input placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 bg-white" />
                 </div>
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px] bg-white">
                         <SelectValue placeholder="Filter by category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -195,7 +195,7 @@ const AdminProducts = () => {
                     </div>
                 ) : filteredProducts && filteredProducts.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <Table>
+                        <Table className="bg-white">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[80px]">Image</TableHead>

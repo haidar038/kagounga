@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DollarSign, ShoppingCart, TrendingUp, Users, Loader2, BarChart3 } from "lucide-react";
+import { DollarSign, ShoppingCart, TrendingUp, Users, Loader2, BarChart3, ChevronLeft } from "lucide-react";
 import { LineChart, Line, PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { useRevenueData, useTopProducts, useOrderStats, useCustomerAnalytics } from "@/hooks/useAnalytics";
+import { Link } from "react-router-dom";
 
 // Color palette for charts
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D"];
@@ -66,6 +67,12 @@ const AdminAnalytics = () => {
 
     return (
         <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>

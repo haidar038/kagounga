@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -17,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, Loader2, Package, ShoppingCart, DollarSign, Clock, Truck, CheckCircle, XCircle, MessageSquare, History, Download, FileSpreadsheet, FileText, Printer, CheckSquare } from "lucide-react";
+import { Eye, Loader2, Package, ShoppingCart, DollarSign, Clock, Truck, CheckCircle, XCircle, MessageSquare, History, Download, FileSpreadsheet, FileText, Printer, CheckSquare, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { exportOrdersToCSV, exportOrdersToExcel } from "@/lib/exportUtils";
 
@@ -110,7 +111,7 @@ const AdminTransactions = () => {
                     items:order_items(*),
                     order_notes(*),
                     order_history(*)
-                `
+                `,
                 )
                 .order("created_at", { ascending: false });
 
@@ -535,6 +536,12 @@ const AdminTransactions = () => {
 
     return (
         <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div>
                 <h1 className="font-heading text-3xl font-bold">Transaction History</h1>
                 <p className="text-muted text-sm mt-1">Monitor all transactions and orders.</p>

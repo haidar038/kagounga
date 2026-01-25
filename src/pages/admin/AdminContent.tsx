@@ -182,15 +182,13 @@ const AdminContent = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Link to="/admin">
-                    <Button variant="ghost" size="sm">
-                        <ChevronLeft className="h-4 w-4 mr-1" />
-                        Back
-                    </Button>
-                </Link>
-                <h1 className="font-heading text-3xl font-bold">Content Management</h1>
-            </div>
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
+            <h1 className="font-heading text-3xl font-bold">Content Management</h1>
 
             <Tabs defaultValue="cta" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 max-w-md">

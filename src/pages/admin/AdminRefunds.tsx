@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { DollarSign, CheckCircle, XCircle, Clock, AlertCircle, Filter, RefreshCw, Loader2, CreditCard, ExternalLink } from "lucide-react";
+import { DollarSign, CheckCircle, XCircle, Clock, AlertCircle, Filter, RefreshCw, Loader2, CreditCard, ChevronLeft } from "lucide-react";
 import { useRefundRequests, useUpdateRefundStatus, useProcessRefund, useSimulateRefundCompletion } from "@/hooks/useRefunds";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -109,7 +110,7 @@ export default function AdminRefunds() {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="text-center">
-                    <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2" />
+                    <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2 " />
                     <p>Loading refund requests...</p>
                 </div>
             </div>
@@ -120,6 +121,12 @@ export default function AdminRefunds() {
     if (error) {
         return (
             <div className="space-y-6">
+                <Link to="/admin">
+                    <Button variant="ghost" size="sm">
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Back
+                    </Button>
+                </Link>
                 <div>
                     <h1 className="text-3xl font-bold">Refund Management</h1>
                     <p className="text-muted-foreground mt-1">Review and process refund requests</p>
@@ -145,7 +152,7 @@ export default function AdminRefunds() {
                                     <li>Refresh this page</li>
                                 </ol>
                             </div>
-                            <Button onClick={() => refetch()} variant="outline">
+                            <Button onClick={() => refetch()} variant="outline" className="bg-white">
                                 <RefreshCw className="w-4 h-4 mr-2" />
                                 Try Again
                             </Button>
@@ -158,13 +165,19 @@ export default function AdminRefunds() {
 
     return (
         <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Refund Management</h1>
                     <p className="text-muted-foreground mt-1">Review and process refund requests</p>
                 </div>
-                <Button variant="outline" onClick={() => refetch()}>
+                <Button variant="outline" className="bg-white" onClick={() => refetch()}>
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Refresh
                 </Button>

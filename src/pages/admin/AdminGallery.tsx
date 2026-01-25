@@ -137,16 +137,14 @@ const AdminGallery = () => {
 
     return (
         <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-4">
-                    <Link to="/admin">
-                        <Button variant="ghost" size="sm">
-                            <ChevronLeft className="h-4 w-4 mr-1" />
-                            Back
-                        </Button>
-                    </Link>
-                    <h1 className="font-heading text-3xl font-bold">Gallery Management</h1>
-                </div>
+                <h1 className="font-heading text-3xl font-bold">Gallery Management</h1>
                 <Button onClick={openCreateDialog}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Image
@@ -192,9 +190,9 @@ const AdminGallery = () => {
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
-                                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
-                                    <p className="text-xs text-foreground truncate">{image.alt_text}</p>
-                                    <p className="text-xs text-muted">Order: {image.display_order}</p>
+                                <div className="absolute bottom-0 left-0 right-0 p-2 pt-12 bg-gradient-to-t from-background/90 to-transparent">
+                                    <p className="text-sm font-semibold text-foreground truncate">{image.alt_text}</p>
+                                    <p className="text-xs font-semibold text-muted">Order: {image.display_order}</p>
                                 </div>
                             </div>
                         ))}

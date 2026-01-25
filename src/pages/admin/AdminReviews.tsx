@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { MessageSquare, Check, X, Trash2, Search, Filter } from "lucide-react";
+import { MessageSquare, Check, X, Trash2, Search, Filter, ChevronLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity } from "@/lib/activityLogger";
 import { StarRating } from "@/components/product/StarRating";
@@ -46,7 +47,7 @@ export default function AdminReviews() {
                     `
           *,
           products (name)
-        `
+        `,
                 )
                 .order("created_at", { ascending: false });
 
@@ -215,7 +216,13 @@ export default function AdminReviews() {
     };
 
     return (
-        <div className="container mx-auto py-8 px-4">
+        <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
                     <MessageSquare className="w-8 h-8" />
@@ -229,11 +236,11 @@ export default function AdminReviews() {
                 <div className="flex-1">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <Input placeholder={t("Search reviews...")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                        <Input placeholder={t("Search reviews...")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 bg-white" />
                     </div>
                 </div>
                 <Select value={filterStatus} onValueChange={(value: any) => setFilterStatus(value)}>
-                    <SelectTrigger className="w-full md:w-[200px]">
+                    <SelectTrigger className="w-full md:w-[200px] bg-white">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue />
                     </SelectTrigger>

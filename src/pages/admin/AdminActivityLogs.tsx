@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Activity, Filter, Download, Search, ChevronDown, RefreshCw } from "lucide-react";
+import { Activity, Filter, Download, Search, ChevronDown, RefreshCw, ChevronLeft } from "lucide-react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,7 +62,13 @@ export default function AdminActivityLogs() {
     };
 
     return (
-        <div className="container mx-auto py-8 px-4">
+        <div className="space-y-6">
+            <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back
+                </Button>
+            </Link>
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
@@ -71,11 +78,11 @@ export default function AdminActivityLogs() {
                     <p className="text-gray-600">{t("Track all admin actions and changes")}</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={refresh} variant="outline">
+                    <Button onClick={refresh} variant="outline" className="bg-white">
                         <RefreshCw className="w-4 h-4 mr-2" />
                         {t("Refresh")}
                     </Button>
-                    <Button onClick={exportToCSV} variant="outline">
+                    <Button onClick={exportToCSV} variant="outline" className="bg-white">
                         <Download className="w-4 h-4 mr-2" />
                         {t("Export CSV")}
                     </Button>
@@ -86,11 +93,11 @@ export default function AdminActivityLogs() {
             <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <Input placeholder={t("Search logs...")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+                    <Input placeholder={t("Search logs...")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 bg-white" />
                 </div>
 
                 <Select value={actionTypeFilter} onValueChange={setActionTypeFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue placeholder={t("All Actions")} />
                     </SelectTrigger>
@@ -108,7 +115,7 @@ export default function AdminActivityLogs() {
                 </Select>
 
                 <Select value={entityTypeFilter} onValueChange={setEntityTypeFilter}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue placeholder={t("All Entities")} />
                     </SelectTrigger>
